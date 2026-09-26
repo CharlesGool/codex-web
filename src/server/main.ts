@@ -457,11 +457,14 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
     root: "/",
     prefix: "/@fs/",
     decorateReply: false,
+    cacheControl: false,
   });
 
   await app.register(fastifyStatic, {
     root: path.resolve(__dirname, "../../scratch/asar/webview"),
     prefix: "/",
+    cacheControl: false,
+    preCompressed: true,
   });
 
   app.get("/", async (_request, reply) => {

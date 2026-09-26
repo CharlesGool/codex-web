@@ -12,6 +12,7 @@ const cookieName = "codex_web_session";
 const sessionLifetimeMs = 12 * 60 * 60 * 1000;
 const failureWindowMs = 15 * 60 * 1000;
 const maxFailures = 5;
+const versionedWebAsset = /^\/assets\/[^/?]+-[a-f0-9]{8,}\.(?:js|css)(?:\?.*)?$/i;
 
 type Credential = { username: string; salt: string; hash: string };
 type Session = { expiresAt: number; sockets: Set<WebSocket> };
@@ -62,7 +63,14 @@ export async function installAuthentication(app: FastifyInstance) {
     reply.header("Referrer-Policy", "no-referrer");
     reply.header("Cache-Control", "no-store");
     if (request.url === "/login" || request.url === "/__auth/login") return;
-    if (validSession(request.headers.cookie)) return;
+    if (validSession(request.headers.cookie)) {
+      if ((request.method === "GET" || request.method === "HEAD") && versionedWebAsset.test(request.url)) {
+        // Patched bundles keep their upstream filenames, so use a short lifetime.
+        reply.header("Cache-Control", "private, max-age=300");
+        reply.header("Vary", "Accept-Encoding");
+      }
+      return;
+    }
     if (request.method === "GET" && request.headers.accept?.includes("text/html")) {
       return reply.redirect("/login");
     }

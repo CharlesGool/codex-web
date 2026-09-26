@@ -31,6 +31,11 @@ checks `PATH` and falls back to the Codex runtime's bundled Git when present.
 Set `CODEX_WEB_GIT_BIN_DIR` to another Git bin directory if needed. Without
 Git, opening the side or bottom panel can briefly flash and then close.
 
+The build prepares Brotli and gzip variants of larger JavaScript and CSS files.
+Authenticated versioned assets use a private five-minute browser cache; HTML,
+API responses, and local file routes are not cached. After changing a bundled
+asset without changing its filename, use a hard refresh to see it immediately.
+
 run it with `npx`:
 
 ```bash

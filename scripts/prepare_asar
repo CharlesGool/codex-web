@@ -47,3 +47,4 @@ patch --batch --forward --strip 1 --directory scratch/asar < patches/app-host-js
 patch --batch --forward --strip 1 --directory scratch/asar < patches/app-host-browser-windows.patch
 rm -rf scratch/asar/node_modules/better-sqlite3
 ./scripts/prepare_native_terminal
+node ./scripts/compress_webview_assets.mjs
