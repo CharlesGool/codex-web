@@ -36,6 +36,12 @@ Authenticated versioned assets use a private five-minute browser cache; HTML,
 API responses, and local file routes are not cached. After changing a bundled
 asset without changing its filename, use a hard refresh to see it immediately.
 
+In this fork, the file preview's **Download** action saves local host files
+through the authenticated web server. Its menu can also open the file or its
+folder in a separate File Browser instance on port `8002` of the same host.
+File Browser has its own login. These actions currently target files on the
+Codex Web host, not files on a remote execution host.
+
 run it with `npx`:
 
 ```bash

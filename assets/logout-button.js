@@ -32,8 +32,8 @@
     const button = document.createElement("button");
     button.type = "button";
     button.className = "codex-web-logout-button";
-    button.textContent = "退出登录";
-    button.setAttribute("aria-label", "退出登录");
+    button.textContent = "退出面板";
+    button.setAttribute("aria-label", "退出面板");
     button.addEventListener("click", async (event) => {
       event.stopPropagation();
       button.disabled = true;

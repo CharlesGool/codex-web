@@ -8,6 +8,7 @@ declare global {
 
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import { createReadStream } from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -452,6 +453,37 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
 
     return reply.send({ files });
   });
+
+  app.get<{ Querystring: { path?: string; hostId?: string } }>(
+    "/__backend/download",
+    async (request, reply) => {
+      const filePath = request.query.path;
+      if (typeof filePath !== "string" || !path.isAbsolute(filePath) ||
+          (request.query.hostId != null && request.query.hostId !== "local")) {
+        return reply.code(400).send({ error: "Invalid local file path" });
+      }
+      try {
+        const stats = await fs.stat(filePath);
+        if (!stats.isFile()) return reply.code(400).send({ error: "Not a file" });
+        const name = path.basename(filePath);
+        const encodedName = encodeURIComponent(name).replace(/['()*]/g, (char) =>
+          `%${char.charCodeAt(0).toString(16).toUpperCase()}`,
+        );
+        reply.header("Content-Disposition", `attachment; filename="download"; filename*=UTF-8''${encodedName}`);
+        reply.header("Content-Length", stats.size);
+        reply.type("application/octet-stream");
+        return reply.send(createReadStream(filePath));
+      } catch (error) {
+        if (["ENOENT", "ENOTDIR"].includes((error as NodeJS.ErrnoException).code ?? "")) {
+          return reply.code(404).send({ error: "File not found" });
+        }
+        if ((error as NodeJS.ErrnoException).code === "EACCES") {
+          return reply.code(403).send({ error: "File access denied" });
+        }
+        throw error;
+      }
+    },
+  );
 
   await app.register(fastifyStatic, {
     root: "/",
