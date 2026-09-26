@@ -26,6 +26,11 @@ default, it listens on `127.0.0.1:8214`.
 it will use `codex` from `PATH` if available, or `CODEX_CLI_PATH` if you set
 it.
 
+Git must also be available to the server process. When using `start.sh`, it
+checks `PATH` and falls back to the Codex runtime's bundled Git when present.
+Set `CODEX_WEB_GIT_BIN_DIR` to another Git bin directory if needed. Without
+Git, opening the side or bottom panel can briefly flash and then close.
+
 run it with `npx`:
 
 ```bash
