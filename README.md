@@ -109,6 +109,7 @@ someone with access to the web ui may be able to:
   - inline images
   - editor sidepanel
   - transcription
+  - integrated terminal on Linux hosts after preparing the bundled app
 
 ## roadmap
 
@@ -116,7 +117,6 @@ some parts of the desktop experience are not wired up yet:
 
 - browser panel support, likely rebuilt around iframes
 - computer use on linux, which could become a very powerful feature
-- terminal support
 - git worker integration
 - whatever else people find and file issues for
 

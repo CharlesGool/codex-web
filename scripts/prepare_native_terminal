@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# The desktop app archive is built for macOS arm64. Its bundled node-pty
+# binary cannot run in the Linux Node.js server that hosts this WebUI.
+if [[ "$(uname -s)" != "Linux" ]]; then
+  exit 0
+fi
+
+pty_dir="scratch/asar/node_modules/node-pty"
+pty_version="$(node -p "require('./${pty_dir}/package.json').version")"
+build_dir="$(mktemp -d)"
+trap 'rm -r -- "$build_dir"' EXIT
+
+npm install --prefix "$build_dir" --no-save --no-audit --no-fund "node-pty@${pty_version}"
+
+native_module="${build_dir}/node_modules/node-pty/build/Release/pty.node"
+if [[ ! -f "$native_module" ]]; then
+  echo "node-pty did not build a Linux native module" >&2
+  exit 1
+fi
+
+install -m 0755 "$native_module" "${pty_dir}/build/Release/pty.node"
+
+node - <<'JS'
+const pty = require('./scratch/asar/node_modules/node-pty');
+if (typeof pty.spawn !== 'function') {
+  throw new Error('node-pty did not load after installing its Linux module');
+}
+JS
