@@ -5,10 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.installAuthentication = installAuthentication;
 const node_crypto_1 = require("node:crypto");
+const node_fs_1 = require("node:fs");
 const promises_1 = __importDefault(require("node:fs/promises"));
 const node_os_1 = __importDefault(require("node:os"));
 const node_path_1 = __importDefault(require("node:path"));
 const node_util_1 = require("node:util");
+const trusted_ips_js_1 = require("./trusted-ips.js");
 const scrypt = (0, node_util_1.promisify)(node_crypto_1.scrypt);
 const cookieName = "codex_web_session";
 const sessionLifetimeMs = 12 * 60 * 60 * 1000;
@@ -39,6 +41,31 @@ async function installAuthentication(app) {
     const expectedHash = Buffer.from(credential.hash, "hex");
     const sessions = new Map();
     const failures = new Map();
+    const trustedSockets = new Map();
+    let trustedIps = (0, trusted_ips_js_1.readTrustedIps)();
+    function trustedPeer(address) {
+        const ip = (0, trusted_ips_js_1.normalizePeerIp)(address);
+        return ip && trustedIps.has(ip) ? ip : null;
+    }
+    const reloadTrustedIps = () => {
+        try {
+            trustedIps = (0, trusted_ips_js_1.readTrustedIps)();
+        }
+        catch (error) {
+            // A malformed or unreadable list must never leave old exemptions active.
+            trustedIps = new Set();
+            console.error("Codex Web trusted IP list rejected:", error);
+        }
+        for (const [ip, sockets] of trustedSockets) {
+            if (trustedIps.has(ip))
+                continue;
+            for (const socket of sockets)
+                socket.close(1008, "IP no longer trusted");
+            trustedSockets.delete(ip);
+        }
+    };
+    (0, node_fs_1.watchFile)(trusted_ips_js_1.trustedIpsPath, { interval: 1000, persistent: false }, reloadTrustedIps);
+    app.addHook("onClose", async () => (0, node_fs_1.unwatchFile)(trusted_ips_js_1.trustedIpsPath, reloadTrustedIps));
     function validSession(header) {
         const id = cookieValue(header);
         if (!id)
@@ -60,7 +87,7 @@ async function installAuthentication(app) {
         reply.header("Cache-Control", "no-store");
         if (request.url === "/login" || request.url === "/__auth/login")
             return;
-        if (validSession(request.headers.cookie)) {
+        if (validSession(request.headers.cookie) || trustedPeer(request.raw.socket.remoteAddress)) {
             if ((request.method === "GET" || request.method === "HEAD") && versionedWebAsset.test(request.url)) {
                 // Patched bundles keep their upstream filenames, so use a short lifetime.
                 reply.header("Cache-Control", "private, max-age=300");
@@ -74,7 +101,7 @@ async function installAuthentication(app) {
         return reply.code(401).send({ error: "Authentication required" });
     });
     app.get("/login", async (request, reply) => {
-        if (validSession(request.headers.cookie))
+        if (validSession(request.headers.cookie) || trustedPeer(request.raw.socket.remoteAddress))
             return reply.redirect("/");
         reply.header("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; form-action 'self'; base-uri 'none'");
         return reply.type("text/html; charset=utf-8").send(loginPage);
@@ -126,9 +153,30 @@ async function installAuthentication(app) {
         authorizeUpgrade(request) {
             if (!sameOrigin(request))
                 return null;
-            return validSession(request.headers.cookie);
+            const id = validSession(request.headers.cookie);
+            if (id)
+                return { kind: "session", id };
+            const ip = trustedPeer(request.socket.remoteAddress);
+            return ip ? { kind: "trusted-ip", ip } : null;
         },
-        registerSocket(id, socket) {
+        registerSocket(authorization, socket) {
+            if (authorization.kind === "trusted-ip") {
+                const { ip } = authorization;
+                if (!trustedIps.has(ip)) {
+                    socket.close(1008, "IP no longer trusted");
+                    return;
+                }
+                const sockets = trustedSockets.get(ip) ?? new Set();
+                sockets.add(socket);
+                trustedSockets.set(ip, sockets);
+                socket.on("close", () => {
+                    sockets.delete(socket);
+                    if (sockets.size === 0)
+                        trustedSockets.delete(ip);
+                });
+                return;
+            }
+            const { id } = authorization;
             sessions.get(id)?.sockets.add(socket);
             socket.on("close", () => sessions.get(id)?.sockets.delete(socket));
             socket.on("message", () => {

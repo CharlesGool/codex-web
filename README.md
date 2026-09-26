@@ -168,3 +168,20 @@ session. The WebSocket bridge checks the session and same-origin `Origin`
 header before upgrading. Sessions expire after 12 hours. Use HTTPS or a trusted
 encrypted tunnel when accessing the service outside a trusted local network:
 HTTP alone does not protect the password or session cookie in transit.
+
+To let specific LAN devices connect without signing in, add their actual client
+IPv4 addresses to `~/.config/codex-web/trusted-ips.json`:
+
+```bash
+node scripts/manage-trusted-ips.mjs add 172.22.31.94 172.22.31.92
+node scripts/manage-trusted-ips.mjs list
+node scripts/manage-trusted-ips.mjs remove 172.22.31.94
+```
+
+The list accepts exact private or loopback IPv4 addresses, reloads within about
+one second, and applies to both HTTP and WebSocket connections. All other
+clients still need the username and password. `CODEX_WEB_TRUSTED_IPS_FILE` sets
+a different file location. The server uses the TCP peer address and ignores
+`X-Forwarded-For`; do not add a shared reverse proxy's address because that
+would exempt all clients connecting through it. On an exempt device, logging
+out clears the cookie but the device still has access through its trusted IP.

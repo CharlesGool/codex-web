@@ -280,14 +280,14 @@ async function startIpcBridgeServer(options) {
             socket.destroy();
             return;
         }
-        const sessionId = auth.authorizeUpgrade(request);
-        if (!sessionId) {
+        const authorization = auth.authorizeUpgrade(request);
+        if (!authorization) {
             socket.write("HTTP/1.1 401 Unauthorized\r\nConnection: close\r\n\r\n");
             socket.destroy();
             return;
         }
         websocketServer.handleUpgrade(request, socket, head, (upgradedSocket) => {
-            auth.registerSocket(sessionId, upgradedSocket);
+            auth.registerSocket(authorization, upgradedSocket);
             websocketServer.emit("connection", upgradedSocket, request);
         });
     });

@@ -1,4 +1,5 @@
 import { randomBytes, scrypt as scryptCallback, timingSafeEqual } from "node:crypto";
+import { unwatchFile, watchFile } from "node:fs";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -6,6 +7,7 @@ import { promisify } from "node:util";
 import type { IncomingMessage } from "node:http";
 import type { FastifyInstance } from "fastify";
 import type { WebSocket } from "ws";
+import { normalizePeerIp, readTrustedIps, trustedIpsPath } from "./trusted-ips.js";
 
 const scrypt = promisify(scryptCallback);
 const cookieName = "codex_web_session";
@@ -16,6 +18,7 @@ const versionedWebAsset = /^\/assets\/[^/?]+-[a-f0-9]{8,}\.(?:js|css)(?:\?.*)?$/
 
 type Credential = { username: string; salt: string; hash: string };
 type Session = { expiresAt: number; sockets: Set<WebSocket> };
+type Authorization = { kind: "session"; id: string } | { kind: "trusted-ip"; ip: string };
 
 const loginPage = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>登录 Codex Web</title><style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f7f7f5;color:#222;font:16px system-ui,sans-serif}main{width:min(380px,calc(100vw - 32px));background:#fff;padding:32px;border:1px solid #ddd;border-radius:16px;box-shadow:0 12px 40px #0001}h1{font-size:24px;margin:0 0 24px}label{display:block;margin:16px 0 6px}input{width:100%;font:inherit;padding:11px;border:1px solid #aaa;border-radius:8px}button{width:100%;font:inherit;margin-top:24px;padding:12px;color:#fff;background:#1769d1;border:0;border-radius:8px;cursor:pointer}button:disabled{opacity:.6}#error{min-height:24px;color:#b42318;margin-top:12px}
@@ -44,6 +47,30 @@ export async function installAuthentication(app: FastifyInstance) {
   const expectedHash = Buffer.from(credential.hash, "hex");
   const sessions = new Map<string, Session>();
   const failures = new Map<string, { count: number; resetAt: number }>();
+  const trustedSockets = new Map<string, Set<WebSocket>>();
+  let trustedIps = readTrustedIps();
+
+  function trustedPeer(address: string | undefined): string | null {
+    const ip = normalizePeerIp(address);
+    return ip && trustedIps.has(ip) ? ip : null;
+  }
+
+  const reloadTrustedIps = () => {
+    try {
+      trustedIps = readTrustedIps();
+    } catch (error) {
+      // A malformed or unreadable list must never leave old exemptions active.
+      trustedIps = new Set();
+      console.error("Codex Web trusted IP list rejected:", error);
+    }
+    for (const [ip, sockets] of trustedSockets) {
+      if (trustedIps.has(ip)) continue;
+      for (const socket of sockets) socket.close(1008, "IP no longer trusted");
+      trustedSockets.delete(ip);
+    }
+  };
+  watchFile(trustedIpsPath, { interval: 1000, persistent: false }, reloadTrustedIps);
+  app.addHook("onClose", async () => unwatchFile(trustedIpsPath, reloadTrustedIps));
 
   function validSession(header: string | undefined): string | null {
     const id = cookieValue(header);
@@ -63,7 +90,7 @@ export async function installAuthentication(app: FastifyInstance) {
     reply.header("Referrer-Policy", "no-referrer");
     reply.header("Cache-Control", "no-store");
     if (request.url === "/login" || request.url === "/__auth/login") return;
-    if (validSession(request.headers.cookie)) {
+    if (validSession(request.headers.cookie) || trustedPeer(request.raw.socket.remoteAddress)) {
       if ((request.method === "GET" || request.method === "HEAD") && versionedWebAsset.test(request.url)) {
         // Patched bundles keep their upstream filenames, so use a short lifetime.
         reply.header("Cache-Control", "private, max-age=300");
@@ -78,7 +105,7 @@ export async function installAuthentication(app: FastifyInstance) {
   });
 
   app.get("/login", async (request, reply) => {
-    if (validSession(request.headers.cookie)) return reply.redirect("/");
+    if (validSession(request.headers.cookie) || trustedPeer(request.raw.socket.remoteAddress)) return reply.redirect("/");
     reply.header("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; form-action 'self'; base-uri 'none'");
     return reply.type("text/html; charset=utf-8").send(loginPage);
   });
@@ -126,11 +153,30 @@ export async function installAuthentication(app: FastifyInstance) {
   });
 
   return {
-    authorizeUpgrade(request: IncomingMessage): string | null {
+    authorizeUpgrade(request: IncomingMessage): Authorization | null {
       if (!sameOrigin(request)) return null;
-      return validSession(request.headers.cookie);
+      const id = validSession(request.headers.cookie);
+      if (id) return { kind: "session", id };
+      const ip = trustedPeer(request.socket.remoteAddress);
+      return ip ? { kind: "trusted-ip", ip } : null;
     },
-    registerSocket(id: string, socket: WebSocket): void {
+    registerSocket(authorization: Authorization, socket: WebSocket): void {
+      if (authorization.kind === "trusted-ip") {
+        const { ip } = authorization;
+        if (!trustedIps.has(ip)) {
+          socket.close(1008, "IP no longer trusted");
+          return;
+        }
+        const sockets = trustedSockets.get(ip) ?? new Set<WebSocket>();
+        sockets.add(socket);
+        trustedSockets.set(ip, sockets);
+        socket.on("close", () => {
+          sockets.delete(socket);
+          if (sockets.size === 0) trustedSockets.delete(ip);
+        });
+        return;
+      }
+      const { id } = authorization;
       sessions.get(id)?.sockets.add(socket);
       socket.on("close", () => sessions.get(id)?.sockets.delete(socket));
       socket.on("message", () => {
