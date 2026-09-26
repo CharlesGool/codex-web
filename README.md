@@ -144,3 +144,17 @@ talk.
   today. i can't wait for the mobile app but judging by the other openai mobile
   apps, i'm a little bit skeptical about the quality of the mobile experience.
   time will tell.
+# Access protection for a network deployment
+
+Before starting the server, create a local login credential with
+`node scripts/set-auth-password.mjs USERNAME`. The command prints a newly
+generated password once and stores only its scrypt hash in
+`~/.config/codex-web/auth.json` (mode 0600). Set `CODEX_WEB_AUTH_FILE` to use a
+different location. Run the command again and restart the service to rotate the
+password; a restart also invalidates all sessions.
+
+Every HTTP route, including static assets, uploads, and `/@fs/`, requires a
+session. The WebSocket bridge checks the session and same-origin `Origin`
+header before upgrading. Sessions expire after 12 hours. Use HTTPS or a trusted
+encrypted tunnel when accessing the service outside a trusted local network:
+HTTP alone does not protect the password or session cookie in transit.

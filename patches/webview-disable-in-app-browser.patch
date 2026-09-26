@@ -1,0 +1,11 @@
+--- a/webview/assets/app-initial-236e1501144c.js
++++ b/webview/assets/app-initial-236e1501144c.js
+@@ -347832,7 +347832,8 @@
+         "browser.in-app": {
+           accessPolicy: `workspace-in-app-browser`,
+           configFeatures: [{ key: `in_app_browser`, host: `default` }],
+-          supportedClients: [`electron`],
++          // This web host has no WebContentsView renderer for the in-app browser.
++          supportedClients: [`unsupported`],
+         },
+         chatgpt: {

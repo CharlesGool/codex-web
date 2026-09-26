@@ -156,6 +156,9 @@ function unimplemented(method: string): never {
 }
 
 export function emitRendererEvent(channel: string, args: unknown[]): void {
+  if (isUnsupportedBrowserPanelMessage(channel, args)) {
+    return;
+  }
   const listeners = rendererListeners.get(channel);
   if (!listeners || listeners.size === 0) {
     return;
@@ -164,6 +167,24 @@ export function emitRendererEvent(channel: string, args: unknown[]): void {
   for (const listener of listeners) {
     listener(event, ...args);
   }
+}
+
+function isUnsupportedBrowserPanelMessage(
+  channel: string,
+  args: unknown[],
+): boolean {
+  if (
+    channel !== "codex_desktop:message-from-view" &&
+    channel !== "codex_desktop:message-for-view"
+  ) {
+    return false;
+  }
+  const message = args[0];
+  return (
+    isRecord(message) &&
+    (message.type === "open-browser-tab" ||
+      message.type === "browser-sidebar-open-panel-without-animation")
+  );
 }
 
 function handleIncomingMessage(message: MainToRendererMessage): void {
@@ -440,6 +461,9 @@ electronShim.onMemoryNavigationChanged = (navigation) => {
 
 export const ipcRenderer = {
   invoke(channel: string, ...args: unknown[]): Promise<unknown> {
+    if (isUnsupportedBrowserPanelMessage(channel, args)) {
+      return Promise.resolve(undefined);
+    }
     if (channel === "codex_desktop:message-from-view" && args.length === 1) {
       if (isOpenInBrowserMessage(args[0])) {
         window.open(args[0].url, "_blank", "noopener,noreferrer");
@@ -488,6 +512,9 @@ export const ipcRenderer = {
     return this.removeListener(channel, listener);
   },
   send(channel: string, ...args: unknown[]): void {
+    if (isUnsupportedBrowserPanelMessage(channel, args)) {
+      return;
+    }
     enqueueMessage({
       type: "ipc-renderer-send",
       channel,

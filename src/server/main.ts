@@ -18,6 +18,7 @@ import fastifyMultipart from "@fastify/multipart";
 import fastifyStatic from "@fastify/static";
 import { installModuleAliasHook } from "./module";
 import { glob } from "glob";
+import { installAuthentication } from "./auth";
 
 type ServerOptions = {
   host: string;
@@ -414,6 +415,7 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
   const bridgeState = getIpcMainBridgeState();
   const app = Fastify({ logger: false });
   const websocketServer = new WebSocketServer({ noServer: true });
+  const auth = await installAuthentication(app);
 
   await app.register(fastifyMultipart, {
     limits: {
@@ -486,7 +488,15 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
       return;
     }
 
+    const sessionId = auth.authorizeUpgrade(request);
+    if (!sessionId) {
+      socket.write("HTTP/1.1 401 Unauthorized\r\nConnection: close\r\n\r\n");
+      socket.destroy();
+      return;
+    }
+
     websocketServer.handleUpgrade(request, socket, head, (upgradedSocket) => {
+      auth.registerSocket(sessionId, upgradedSocket);
       websocketServer.emit("connection", upgradedSocket, request);
     });
   });
