@@ -1,12 +1,13 @@
 --- a/webview/index.html
 +++ b/webview/index.html
-@@ -3,7 +3,10 @@
+@@ -3,7 +3,11 @@
    <head>
      <meta name="referrer" content="origin" />
      <!-- PROD_BASE_TAG_HERE -->
 +    <base href="/" />
      <!-- PROD_CSP_TAG_HERE -->
 +    <script src="./secure-context-polyfill.js"></script>
++    <script defer src="./logout-button.js"></script>
 +    <script type="module" src="./assets/preload.js"></script>
      <meta charset="UTF-8" />
      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
