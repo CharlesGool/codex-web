@@ -10,7 +10,7 @@ type MenuPayload = { menuId: string; items: MenuItem[] };
 
 let lastPointer = { x: 24, y: 60 };
 let activeMenu: {
-  element: HTMLDivElement;
+  panels: Set<HTMLDivElement>;
   dismiss: () => void;
   timer: number;
 } | null = null;
@@ -20,7 +20,7 @@ document.addEventListener("pointermove", (event) => {
 }, { passive: true });
 document.addEventListener("pointerdown", (event) => {
   lastPointer = { x: event.clientX, y: event.clientY };
-  if (activeMenu && !activeMenu.element.contains(event.target as Node)) {
+  if (activeMenu && ![...activeMenu.panels].some((panel) => panel.contains(event.target as Node))) {
     activeMenu.dismiss();
   }
 }, true);
@@ -34,7 +34,7 @@ document.addEventListener("keydown", (event) => {
 function closeMenu(): void {
   if (!activeMenu) return;
   window.clearTimeout(activeMenu.timer);
-  activeMenu.element.remove();
+  for (const panel of activeMenu.panels) panel.remove();
   activeMenu = null;
 }
 
@@ -43,10 +43,11 @@ function makePanel(): HTMLDivElement {
   panel.setAttribute("role", "menu");
   Object.assign(panel.style, {
     boxSizing: "border-box",
-    minWidth: "220px",
-    maxWidth: "min(300px, calc(100vw - 16px))",
+    minWidth: "min(220px, calc(100vw - 16px))",
+    maxWidth: "calc(100vw - 16px)",
     maxHeight: "calc(100vh - 16px)",
     overflowY: "auto",
+    overflowX: "hidden",
     padding: "5px",
     border: "1px solid color-mix(in srgb, CanvasText 18%, transparent)",
     borderRadius: "10px",
@@ -73,6 +74,17 @@ export function showBrowserMenu(
   root.style.position = "fixed";
   root.style.zIndex = "2147483647";
   document.body.append(root);
+  const panels = new Set<HTMLDivElement>([root]);
+  const openSubmenus = new Map<number, { key: string; panel: HTMLDivElement }>();
+
+  const closeSubmenus = (fromDepth: number) => {
+    for (const [depth, open] of openSubmenus) {
+      if (depth < fromDepth) continue;
+      open.panel.remove();
+      panels.delete(open.panel);
+      openSubmenus.delete(depth);
+    }
+  };
 
   const select = (path: number[]) => {
     closeMenu();
@@ -98,7 +110,6 @@ export function showBrowserMenu(
       }
 
       const wrapper = document.createElement("div");
-      wrapper.style.position = "relative";
       const button = document.createElement("button");
       button.type = "button";
       button.setAttribute("role", "menuitem");
@@ -138,25 +149,28 @@ export function showBrowserMenu(
       wrapper.append(button);
       panel.append(wrapper);
 
-      let submenu: HTMLDivElement | null = null;
       const showSubmenu = () => {
-        for (const sibling of panel.querySelectorAll(":scope > div > [role=menu]")) {
-          (sibling as HTMLElement).style.display = "none";
-        }
+        const depth = path.length + 1;
+        const key = [...path, index].join("/");
+        if (openSubmenus.get(depth)?.key === key) return;
+        closeSubmenus(depth);
         if (!item.submenu || !item.enabled) return;
-        if (!submenu) {
-          submenu = makePanel();
-          submenu.style.position = "absolute";
-          submenu.style.top = "-5px";
-          submenu.style.left = "calc(100% - 3px)";
-          populate(submenu, item.submenu, [...path, index]);
-          wrapper.append(submenu);
-        }
-        submenu.style.display = "block";
-        if (submenu.getBoundingClientRect().right > window.innerWidth - 8) {
-          submenu.style.left = "auto";
-          submenu.style.right = "calc(100% - 3px)";
-        }
+        const submenu = makePanel();
+        submenu.style.position = "fixed";
+        submenu.style.zIndex = "2147483647";
+        populate(submenu, item.submenu, [...path, index]);
+        document.body.append(submenu);
+        panels.add(submenu);
+        openSubmenus.set(depth, { key, panel: submenu });
+        const anchor = button.getBoundingClientRect();
+        const right = anchor.right - 3;
+        const left = anchor.left - submenu.offsetWidth + 3;
+        const x = right + submenu.offsetWidth <= window.innerWidth - 8
+          ? right
+          : left >= 8 ? left : Math.max(8, window.innerWidth - submenu.offsetWidth - 8);
+        const y = Math.max(8, Math.min(anchor.top - 5, window.innerHeight - submenu.offsetHeight - 8));
+        submenu.style.left = `${x}px`;
+        submenu.style.top = `${y}px`;
       };
       wrapper.addEventListener("pointerenter", showSubmenu);
       button.addEventListener("focus", showSubmenu);
@@ -170,7 +184,7 @@ export function showBrowserMenu(
         if (!item.enabled) return;
         if (item.submenu) {
           showSubmenu();
-          submenu?.querySelector<HTMLButtonElement>("button:not(:disabled)")?.focus();
+          openSubmenus.get(path.length + 1)?.panel.querySelector<HTMLButtonElement>("button:not(:disabled)")?.focus();
         } else {
           select([...path, index]);
         }
@@ -182,7 +196,7 @@ export function showBrowserMenu(
   root.style.left = `${Math.max(8, Math.min(lastPointer.x, window.innerWidth - root.offsetWidth - 8))}px`;
   root.style.top = `${Math.max(8, Math.min(lastPointer.y, window.innerHeight - root.offsetHeight - 8))}px`;
   activeMenu = {
-    element: root,
+    panels,
     dismiss,
     timer: window.setTimeout(dismiss, 60_000),
   };
