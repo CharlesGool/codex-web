@@ -10,6 +10,7 @@ import {
   openSelectWorkspaceRootDialog,
   type WorkspaceDirectoryEntries,
 } from "./workspace-root-dialog";
+import { hideBrowserMenu, showBrowserMenu } from "./menu";
 
 type IpcListener = (event: unknown, ...args: unknown[]) => void;
 
@@ -189,6 +190,20 @@ function isUnsupportedBrowserPanelMessage(
 
 function handleIncomingMessage(message: MainToRendererMessage): void {
   if (message.type === "ipc-main-event") {
+    if (message.channel === "codex-web:menu-open") {
+      showBrowserMenu(message.args[0] as Parameters<typeof showBrowserMenu>[0],
+        (menuId, itemPath) => enqueueMessage({
+          type: "ipc-renderer-send",
+          channel: "codex-web:menu-select",
+          args: [menuId, itemPath],
+        }),
+        (menuId) => enqueueMessage({
+          type: "ipc-renderer-send",
+          channel: "codex-web:menu-dismiss",
+          args: [menuId],
+        }));
+      return;
+    }
     emitRendererEvent(message.channel, message.args);
     return;
   }
@@ -285,6 +300,7 @@ function ensureSocket(): void {
     }
   });
   socket.addEventListener("close", () => {
+    hideBrowserMenu();
     needsReload = true;
     const error = new Error("Connection to Codex was lost");
     for (const pending of pendingInvokes.values()) pending.reject(error);

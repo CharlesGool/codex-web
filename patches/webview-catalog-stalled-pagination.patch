@@ -1,0 +1,54 @@
+--- a/webview/assets/app-initial-236e1501144c.js
++++ b/webview/assets/app-initial-236e1501144c.js
+@@ -413299,6 +413299,7 @@
+         #a = new Map();
+         #o = new Map();
+         #s = new Set();
++        #stalledHosts = new Set();
+         #c = new Map();
+         #l = new Set();
+         #u = Promise.resolve();
+@@ -413353,7 +413354,7 @@
+           let t = !1,
+             n = !1;
+           for (let [r, i] of e.hosts)
+-            ((t ||= !i.exhausted || !this.#s.has(r)),
++            ((t ||= (!i.exhausted || !this.#s.has(r)) && !this.#stalledHosts.has(r)),
+               (n ||= i.inFlight != null));
+           return t ? (n ? oAo : aAo) : iAo;
+         }
+@@ -413408,13 +413409,21 @@
+                 ) {
+                   let r = t.entries.length,
+                     i = this.#c.get(e),
++                    a;
++                  try {
+                     a = await this.service.requestSync([e], `immediate`);
++                  } catch {
++                    this.#stalledHosts.add(e);
++                    break;
++                  }
+                   if (
+                     (a != null && this.updateStatus(a),
+                     await this.#T(n.scope, e, t),
+                     t.entries.length === r && this.#c.get(e) === i)
+-                  )
++                  ) {
++                    this.#stalledHosts.add(e);
+                     break;
++                  }
+                 }
+               }),
+             ),
+@@ -413439,7 +413448,10 @@
+             n = new Set(this.#s);
+           this.#s.clear();
+           for (let r of e.hosts)
+-            (r.isComplete &&
++            (this.#c.get(r.hostId) !== r.revision &&
++              this.#stalledHosts.delete(r.hostId),
++              r.isComplete && this.#stalledHosts.delete(r.hostId),
++              r.isComplete &&
+               (this.#s.add(r.hostId),
+               this.#c.has(r.hostId) &&
+                 (!n.has(r.hostId) || this.#c.get(r.hostId) !== r.revision) &&

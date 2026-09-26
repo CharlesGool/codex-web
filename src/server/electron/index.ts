@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 type StubFunction = (...args: unknown[]) => unknown;
 type StubListener = (...args: unknown[]) => void;
 type StubMessagePort = {
@@ -54,6 +56,11 @@ type IpcMainBridgeState = {
   handleRendererSend?: (
     channel: string,
     args: unknown[],
+    windowId: number,
+  ) => void;
+  handleMenuSelection?: (
+    menuId: string,
+    itemPath: number[] | null,
     windowId: number,
   ) => void;
 };
@@ -248,6 +255,17 @@ function createIpcMainStub(): {
     args: unknown[],
     windowId: number,
   ): void => {
+    if (channel === "codex-web:menu-select" || channel === "codex-web:menu-dismiss") {
+      const [menuId, itemPath] = args;
+      if (typeof menuId === "string") {
+        bridgeState.handleMenuSelection?.(
+          menuId,
+          channel === "codex-web:menu-dismiss" ? null : Array.isArray(itemPath) ? itemPath as number[] : null,
+          windowId,
+        );
+      }
+      return;
+    }
     const event = createIpcMainEvent(windowId);
     emitter.emit(channel, event, ...args);
   };
@@ -651,6 +669,11 @@ class WebContentsView {
 
 class Menu {
   static applicationMenu: Menu | null = null;
+  private static openMenus = new Map<string, {
+    callback?: () => void;
+    menu: Menu;
+    window: BrowserWindow;
+  }>();
   items: MenuItem[] = [];
 
   constructor(items: MenuItem[] = []) {
@@ -702,10 +725,84 @@ class Menu {
     this.items.splice(index, 0, item);
   }
 
-  popup(...args: unknown[]): void {
-    log("Menu.popup", args);
+  popup(options: { window?: BrowserWindow; callback?: () => void } = {}): void {
+    const window = options.window ?? BrowserWindow.getFocusedWindow();
+    if (!window || window.isDestroyed()) {
+      options.callback?.();
+      return;
+    }
+    for (const [id, open] of Menu.openMenus) {
+      if (open.window.id === window.id) Menu.finish(id);
+    }
+    const menuId = randomUUID();
+    Menu.openMenus.set(menuId, { menu: this, window, callback: options.callback });
+    (window.webContents as unknown as StubWebContents).send("codex-web:menu-open", {
+      menuId,
+      items: Menu.describe(this),
+    });
+    setTimeout(() => Menu.finish(menuId), 60_000).unref();
+  }
+
+  private static describe(menu: Menu): Array<{
+    checked: boolean;
+    enabled: boolean;
+    label: string;
+    submenu?: ReturnType<typeof Menu.describe>;
+    type: string;
+  }> {
+    return menu.items.filter((item) => item.visible !== false).map((item) => ({
+      checked: item.checked === true,
+      enabled: item.enabled !== false && (item.click != null || item.submenu != null),
+      label: item.label ?? "",
+      type: item.type ?? "normal",
+      ...(item.submenu ? { submenu: Menu.describe(item.submenu) } : {}),
+    }));
+  }
+
+  private static finish(menuId: string): void {
+    const open = Menu.openMenus.get(menuId);
+    if (!open) return;
+    Menu.openMenus.delete(menuId);
+    open.callback?.();
+  }
+
+  static select(menuId: string, itemPath: number[] | null, windowId: number): void {
+    const open = Menu.openMenus.get(menuId);
+    if (!open || open.window.id !== windowId) return;
+    if (itemPath === null) {
+      Menu.finish(menuId);
+      return;
+    }
+    if (itemPath.length < 1 || itemPath.length > 8 ||
+        !itemPath.every((index) => Number.isSafeInteger(index) && index >= 0)) return;
+    let menu = open.menu;
+    let item: MenuItem | undefined;
+    for (const [depth, index] of itemPath.entries()) {
+      item = menu.items.filter((candidate) => candidate.visible !== false)[index];
+      if (!item) return;
+      if (depth < itemPath.length - 1) {
+        if (!item.submenu) return;
+        menu = item.submenu;
+      }
+    }
+    if (!item || item.enabled === false || !item.click || item.submenu) return;
+    let result: unknown;
+    try {
+      result = item.click(item, open.window);
+    } catch (error) {
+      console.error("[electron-main-stub] Menu item failed", error);
+    } finally {
+      Menu.finish(menuId);
+    }
+    Promise.resolve(result).catch((error) => {
+      console.error("[electron-main-stub] Menu item failed", error);
+    });
   }
 }
+
+getIpcMainBridgeState().handleMenuSelection = (menuId, itemPath, windowId) => {
+  Menu.select(menuId, itemPath, windowId);
+};
 
 class MenuItem {
   checked?: boolean;
