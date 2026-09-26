@@ -1,0 +1,11 @@
+--- a/webview/assets/terminal-tab-e66332ee623d.js
++++ b/webview/assets/terminal-tab-e66332ee623d.js
+@@ -214,6 +214,7 @@
+     { platform: u } = ce(),
+     d = k(X, i);
+-  if (a.length < 2 || d) return null;
++  // Keep the terminal usable without the source-directory hint overlay.
++  return null;
+   let f;
+   t[0] !== n || t[1] !== a
+     ? ((f = n == null ? 0 : a.findIndex((e) => c(e, n))),
