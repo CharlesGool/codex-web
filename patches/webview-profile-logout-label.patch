@@ -1,0 +1,11 @@
+--- a/webview/assets/zh-CN-5bff6daefa6d.js
++++ b/webview/assets/zh-CN-5bff6daefa6d.js
+@@ -2930,7 +2930,7 @@
+       "codex.profileDropdown.inviteCoworker": `邀请同事`,
+       "codex.profileDropdown.inviteFriend": `邀请好友`,
+       "codex.profileDropdown.keyboardShortcuts": `键盘快捷方式`,
+-      "codex.profileDropdown.logOut": `退出登录`,
++      "codex.profileDropdown.logOut": `退出账号登录`,
+       "codex.profileDropdown.logOutConfirmation.cancel": `取消`,
+       "codex.profileDropdown.logOutConfirmation.confirm": `退出登录`,
+       "codex.profileDropdown.logOutConfirmation.subtitle": `你需要重新登录才能继续使用 {appName}`,
