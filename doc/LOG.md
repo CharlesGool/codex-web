@@ -28,8 +28,9 @@ This log records work on the web host. It does not replace the upstream project'
 - Checks: The server TypeScript build, webview patch application, changed JavaScript syntax, focused local file-menu action test, archive download link test, `git diff --check`, shell syntax check, and document format check passed. A browser interaction check was not completed.
 - Deployment: The changed server and webview files were copied to the existing deployment. The service is active, and Codex Web and File Browser are listening on their existing addresses. A full browser interaction check has not been completed.
 - GitHub: The local commit is ready. Pushing to `origin/main` is blocked because HTTPS credentials are unavailable and SSH authentication was denied.
+- Standardization audit: The project container has `repo/` and an empty `snapshots/`, but the structure checker reports 87 errors. Most come from missing template directories and documents, while the inherited npm, Nix, patch, and launch files are at the repository root. The active deployment is under `~/Desktop/app/codex-web`, while the deployment standard specifies `~/Desktop/apps/codex-web`. Its launcher depends on a sibling `node/bin` directory, so moving the deployment without adjusting the runtime path would break startup. No source or deployment migration was made during this audit.
 - Remaining: Hard refresh the web page and verify the local archive link download, local file right-click menu, File Browser link, website preview, Pets page, and removal of the default file open destination setting. Check remote file menus separately if those workflows are used.
-- Next action: Complete the browser interaction check and address any behavior it reveals; push the commit after GitHub authentication is available.
+- Next action: Plan a staged layout and deployment migration that preserves the upstream build and patch workflow, then verify startup and browser behavior; push local commits after GitHub authentication is available.
 
 ## Changelog
 
