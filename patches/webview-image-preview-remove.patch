@@ -1,0 +1,62 @@
+--- a/webview/assets/app-initial-236e1501144c.js
++++ b/webview/assets/app-initial-236e1501144c.js
+@@ -330776,7 +330776,7 @@
+       (qda = 100));
+   });
+ function Yda(e) {
+-  let t = (0, Xda.c)(75),
++  let t = (0, Xda.c)(76),
+     {
+       src: n,
+       filename: r,
+@@ -331071,7 +331071,8 @@
+     t[70] !== l ||
+     t[71] !== se ||
+     t[72] !== W ||
+-    t[73] !== ce
++    t[73] !== ce ||
++    t[74] !== a
+       ? ((le = (0, LJ.jsx)(boa, {
+           src: P.src,
+           alt: P.alt,
+@@ -331081,6 +331082,28 @@
+           imageDraggable: !1,
+           onCloseAutoFocus: u,
+           editButton: se,
++          toolbarActions:
++            a == null
++              ? void 0
++              : [
++                  {
++                    ariaLabel: S.formatMessage(
++                      {
++                        id: `imageAttachment.removeAriaLabel`,
++                        defaultMessage: `Remove {filename}`,
++                        description: `Aria label for the remove image attachment button`,
++                      },
++                      { filename: L },
++                    ),
++                    icon: (0, LJ.jsx)(`span`, {
++                      className: `flex size-6 items-center justify-center rounded-full bg-primary-solid text-primary-solid`,
++                      children: (0, LJ.jsx)(qV, { className: `icon-xs` }),
++                    }),
++                    onClick: () => {
++                      (O(!1), a());
++                    },
++                  },
++                ],
+           onPreviousImage: W,
+           onNextImage: ce,
+           portalContainer: l,
+@@ -331096,8 +331119,9 @@
+         (t[71] = se),
+         (t[72] = W),
+         (t[73] = ce),
+-        (t[74] = le))
+-      : (le = t[74]),
++        (t[74] = a),
++        (t[75] = le))
++      : (le = t[75]),
+     le
+   );
+ }
