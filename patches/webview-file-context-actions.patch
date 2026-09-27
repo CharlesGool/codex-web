@@ -1,0 +1,82 @@
+--- a/webview/assets/app-initial-236e1501144c.js
++++ b/webview/assets/app-initial-236e1501144c.js
+@@ -293987,6 +293987,19 @@
+     .catch(() => null)
+     .then(() => yBi(e, t));
+ }
++function codexWebDownloadWorkspaceFile(filePath) {
++  const link = document.createElement(`a`);
++  link.href = `/__backend/download?hostId=local&path=${encodeURIComponent(filePath)}`;
++  link.download = filePath.split(`/`).pop() || `download`;
++  document.body.append(link);
++  link.click();
++  link.remove();
++}
++function codexWebOpenWorkspaceFileBrowser(filePath) {
++  const segments = filePath.split(`/`).filter(Boolean).map(encodeURIComponent);
++  const url = `${window.location.protocol}//${window.location.hostname}:8002/files/${segments.join(`/`)}`;
++  window.open(url, `_blank`, `noopener,noreferrer`);
++}
+ function yBi(
+   e,
+   {
+@@ -294038,6 +294051,59 @@
+           appPath: r,
+         }));
+     };
++  if ((o == null || o === `local`) && u !== `workspace` && S.startsWith(`/`)) {
++    return [
++      {
++        id: `codex-web-file-browser-open`,
++        message: ns({
++          id: `codexWeb.fileContext.openInFileBrowser`,
++          defaultMessage: navigator.language.startsWith(`zh`)
++            ? `在 File Browser 中打开`
++            : `Open in File Browser`,
++        }),
++        onSelect: () => codexWebOpenWorkspaceFileBrowser(S),
++      },
++      {
++        id: `codex-web-file-download`,
++        message: ns({
++          id: `codexWeb.fileContext.download`,
++          defaultMessage: navigator.language.startsWith(`zh`)
++            ? `下载`
++            : `Download`,
++        }),
++        onSelect: () => codexWebDownloadWorkspaceFile(S),
++      },
++      { id: `codex-web-file-actions-separator`, type: `separator` },
++      {
++        id: `codex-web-file-copy-path`,
++        message: XW.copyPath,
++        onSelect: () => {
++          iX.clipboard.writeText(S).catch(() => qW(S));
++        },
++      },
++      {
++        id: `codex-web-file-copy-contents`,
++        message: ns({
++          id: `markdown.fileReference.copyFileContents`,
++          defaultMessage: `Copy file contents`,
++        }),
++        onSelect: () => JRi(e.queryClient, { hostId: o, path: f }),
++      },
++      {
++        id: `codex-web-file-browser-folder`,
++        message: ns({
++          id: `codexWeb.fileContext.openFolderInFileBrowser`,
++          defaultMessage: navigator.language.startsWith(`zh`)
++            ? `在 File Browser 中打开所在文件夹`
++            : `Open folder in File Browser`,
++        }),
++        onSelect: () =>
++          codexWebOpenWorkspaceFileBrowser(
++            S.slice(0, S.lastIndexOf(`/`)) || `/`,
++          ),
++      },
++    ];
++  }
+   return (
+     b &&
+       _.push({

@@ -1,0 +1,15 @@
+--- a/webview/assets/pets-settings-route-66d8bd66f50e.js
++++ b/webview/assets/pets-settings-route-66d8bd66f50e.js
+@@ -2218,7 +2218,11 @@
+       (xn = A()));
+   });
+ function Cn() {
+-  return ne(`1532120159`) ? (0, wn.jsx)(vn, {}) : (0, wn.jsx)(en, {});
++  return (0, wn.jsx)(`div`, {
++    className: `flex min-h-48 items-center justify-center text-secondary`,
++    role: `status`,
++    children: navigator.language.startsWith(`zh`) ? `不可用` : `Unavailable`,
++  });
+ }
+ var wn;
+ e(() => {

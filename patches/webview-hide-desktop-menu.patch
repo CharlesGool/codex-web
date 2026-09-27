@@ -1,0 +1,9 @@
+--- a/webview/assets/app-initial-236e1501144c.js
++++ b/webview/assets/app-initial-236e1501144c.js
+@@ -364463,6 +364463,8 @@
+   });
+ function _Ka() {
++  // The desktop application menu exposes Electron-only commands in this web host.
++  return null;
+   let e = (0, SKa.c)(75),
+     t = $o(),

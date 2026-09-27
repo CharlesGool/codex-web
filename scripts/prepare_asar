@@ -36,6 +36,11 @@ patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-pro
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-use-atfs-for-local-files.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-statsig-override-adapter.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-disable-in-app-browser.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-pets-unavailable.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-hide-desktop-menu.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-file-context-actions.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-hide-default-file-target.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-website-preview.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-profile-logout-label.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-hide-terminal-source-hint.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-prompt-search-param.patch

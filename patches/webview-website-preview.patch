@@ -1,0 +1,99 @@
+--- a/webview/assets/subagent-activity-chip-group-7dd455b4675b.js
++++ b/webview/assets/subagent-activity-chip-group-7dd455b4675b.js
+@@ -26552,9 +26552,11 @@
+           }),
+         })),
+         (d = (0, DU.jsx)(Y, {
+-          id: `localConversation.endResource.openInChatGpt`,
+-          defaultMessage: `ChatGPT`,
+-          description: `Dropdown item for opening a website preview in ChatGPT`,
++          id: `codexWeb.endResource.openInBrowser`,
++          defaultMessage: navigator.language.startsWith(`zh`)
++            ? `浏览器预览`
++            : `Browser preview`,
++          description: `Dropdown item for opening a website preview in the browser`,
+         })),
+         (t[31] = s),
+         (t[32] = d))
+@@ -28423,6 +28425,31 @@
+ function gW(e) {
+   return e.target !== `fileManager`;
+ }
++function codexWebOpenWebsite(target, cwd, hostId) {
++  if (/^https?:\/\//i.test(target)) {
++    window.open(target, `_blank`, `noopener,noreferrer`);
++    return;
++  }
++  if (hostId != null && hostId !== `local`) {
++    window.alert(
++      navigator.language.startsWith(`zh`)
++        ? `远程网站预览不可用`
++        : `Remote website preview is unavailable`,
++    );
++    return;
++  }
++  const filePath = $U({ cwd, target });
++  if (filePath == null || !filePath.startsWith(`/`)) {
++    window.alert(
++      navigator.language.startsWith(`zh`)
++        ? `无法预览此网站`
++        : `This website cannot be previewed`,
++    );
++    return;
++  }
++  const previewUrl = `/__backend/site-preview?path=${encodeURIComponent(filePath)}&hostId=local`;
++  window.open(previewUrl, `_blank`, `noopener,noreferrer`);
++}
+ function _W(e) {
+   let t = (0, SW.c)(99),
+     { conversationId: n, cwd: r, hostId: i, resource: a } = e,
+@@ -28548,15 +28575,7 @@
+     t[53] !== a.target ||
+     t[54] !== o
+       ? ((l = () => {
+-          $a({
+-            scope: o,
+-            path: a.target,
+-            conversationId: n,
+-            cwd: r,
+-            browserEnabled: o.get(M, { name: `browser.in-app` }).isCapable,
+-            hostConfig: c,
+-            hostId: i,
+-          });
++          codexWebOpenWebsite(a.target, r, i);
+         }),
+         (t[49] = n),
+         (t[50] = r),
+@@ -28570,10 +28589,7 @@
+       d;
+     (t[56] !== H || t[57] !== u || t[58] !== a.target
+       ? ((d = (e) => {
+-          if (H) {
+-            Ts({ event: e, href: a.target, initiator: `mcp_app_resource` });
+-            return;
+-          }
++          e.preventDefault();
+           u();
+         }),
+         (t[56] = H),
+@@ -28584,19 +28600,7 @@
+       (B = d));
+     let f;
+     (t[60] !== H || t[61] !== u || t[62] !== a.target
+-      ? ((f = H
+-          ? () => {
+-              sc({
+-                href: a.target,
+-                initiator: `mcp_app_resource`,
+-                openTarget: `in-app-browser`,
+-              });
+-            }
+-          : u),
+-        (t[60] = H),
+-        (t[61] = u),
+-        (t[62] = a.target),
+-        (t[63] = f))
++      ? ((f = u), (t[60] = H), (t[61] = u), (t[62] = a.target), (t[63] = f))
+       : (f = t[63]),
+       (V = f),
+       (W = `group/end-resource relative`),

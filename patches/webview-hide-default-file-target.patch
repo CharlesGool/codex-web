@@ -1,0 +1,9 @@
+--- a/webview/assets/general-settings-f0dd56c74db0.js
++++ b/webview/assets/general-settings-f0dd56c74db0.js
+@@ -5016,6 +5016,8 @@
+ }
+ function wo() {
++  // Desktop application targets cannot open files in the browser host.
++  return null;
+   let e = (0, Q.c)(36),
+     t = K(z),

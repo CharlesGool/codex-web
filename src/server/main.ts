@@ -520,6 +520,49 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
     }
   });
 
+  app.get<{ Querystring: { path?: string; hostId?: string } }>(
+    "/__backend/site-preview",
+    async (request, reply) => {
+      const requestedPath = request.query.path;
+      if (typeof requestedPath !== "string" || !path.isAbsolute(requestedPath) ||
+          (request.query.hostId != null && request.query.hostId !== "local")) {
+        return reply.code(400).send({ error: "Invalid local website path" });
+      }
+      try {
+        let htmlPath = requestedPath;
+        const builtPath = path.join(path.dirname(requestedPath), "dist", "index.html");
+        if (path.basename(requestedPath) === "index.html") {
+          try {
+            if ((await fs.stat(builtPath)).isFile()) htmlPath = builtPath;
+          } catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+          }
+        }
+        const stats = await fs.stat(htmlPath);
+        if (!stats.isFile() || path.extname(htmlPath).toLowerCase() !== ".html") {
+          return reply.code(400).send({ error: "Not an HTML file" });
+        }
+        const directoryUrl = `/@fs/${path.dirname(htmlPath).split(path.sep).filter(Boolean).map(encodeURIComponent).join("/")}/`;
+        const html = (await fs.readFile(htmlPath, "utf8"))
+          .replace(/\b(src|href)=(['"])\/(?!\/)/gi, (_match, attribute: string, quote: string) =>
+            `${attribute}=${quote}${directoryUrl}`)
+          .replace(/<head(\s[^>]*)?>/i, (match) => `${match}<base href="${directoryUrl}">`);
+        reply.header("Cache-Control", "no-store");
+        reply.header("Referrer-Policy", "no-referrer");
+        reply.type("text/html; charset=utf-8");
+        return reply.send(html);
+      } catch (error) {
+        if (["ENOENT", "ENOTDIR"].includes((error as NodeJS.ErrnoException).code ?? "")) {
+          return reply.code(404).send({ error: "Website file not found" });
+        }
+        if ((error as NodeJS.ErrnoException).code === "EACCES") {
+          return reply.code(403).send({ error: "Website file access denied" });
+        }
+        throw error;
+      }
+    },
+  );
+
   await app.register(fastifyStatic, {
     root: "/",
     prefix: "/@fs/",

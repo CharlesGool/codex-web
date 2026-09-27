@@ -6,6 +6,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_child_process_1 = require("node:child_process");
 const node_crypto_1 = require("node:crypto");
+const node_fs_1 = require("node:fs");
 const promises_1 = __importDefault(require("node:fs/promises"));
 const node_os_1 = __importDefault(require("node:os"));
 const node_path_1 = __importDefault(require("node:path"));
@@ -247,6 +248,110 @@ async function startIpcBridgeServer(options) {
             }
         })());
         return reply.send({ files });
+    });
+    app.get("/__backend/download", async (request, reply) => {
+        const filePath = request.query.path;
+        if (typeof filePath !== "string" || !node_path_1.default.isAbsolute(filePath) ||
+            (request.query.hostId != null && request.query.hostId !== "local")) {
+            return reply.code(400).send({ error: "Invalid local file path" });
+        }
+        try {
+            const stats = await promises_1.default.stat(filePath);
+            if (!stats.isFile())
+                return reply.code(400).send({ error: "Not a file" });
+            const name = node_path_1.default.basename(filePath);
+            const encodedName = encodeURIComponent(name).replace(/['()*]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`);
+            reply.header("Content-Disposition", `attachment; filename="download"; filename*=UTF-8''${encodedName}`);
+            reply.header("Content-Length", stats.size);
+            reply.type("application/octet-stream");
+            return reply.send((0, node_fs_1.createReadStream)(filePath));
+        }
+        catch (error) {
+            if (["ENOENT", "ENOTDIR"].includes(error.code ?? "")) {
+                return reply.code(404).send({ error: "File not found" });
+            }
+            if (error.code === "EACCES") {
+                return reply.code(403).send({ error: "File access denied" });
+            }
+            throw error;
+        }
+    });
+    app.get("/__backend/path-info", async (request, reply) => {
+        const requestedPath = request.query.path;
+        if (typeof requestedPath !== "string" || !requestedPath.trim()) {
+            return reply.code(400).send({ error: "Enter a path" });
+        }
+        const input = requestedPath.trim();
+        const expandedPath = input === "~"
+            ? node_os_1.default.homedir()
+            : input.startsWith("~/")
+                ? node_path_1.default.join(node_os_1.default.homedir(), input.slice(2))
+                : input;
+        if (!node_path_1.default.isAbsolute(expandedPath) || expandedPath.includes("\0")) {
+            return reply.code(400).send({ error: "Enter an absolute path" });
+        }
+        const resolvedPath = node_path_1.default.resolve(expandedPath);
+        try {
+            const stats = await promises_1.default.stat(resolvedPath);
+            if (!stats.isDirectory() && !stats.isFile()) {
+                return reply.code(400).send({ error: "Unsupported path type" });
+            }
+            return reply.send({
+                path: resolvedPath,
+                type: stats.isDirectory() ? "directory" : "file",
+            });
+        }
+        catch (error) {
+            if (["ENOENT", "ENOTDIR"].includes(error.code ?? "")) {
+                return reply.code(404).send({ error: "Path not found" });
+            }
+            if (error.code === "EACCES") {
+                return reply.code(403).send({ error: "Path access denied" });
+            }
+            throw error;
+        }
+    });
+    app.get("/__backend/site-preview", async (request, reply) => {
+        const requestedPath = request.query.path;
+        if (typeof requestedPath !== "string" || !node_path_1.default.isAbsolute(requestedPath) ||
+            (request.query.hostId != null && request.query.hostId !== "local")) {
+            return reply.code(400).send({ error: "Invalid local website path" });
+        }
+        try {
+            let htmlPath = requestedPath;
+            const builtPath = node_path_1.default.join(node_path_1.default.dirname(requestedPath), "dist", "index.html");
+            if (node_path_1.default.basename(requestedPath) === "index.html") {
+                try {
+                    if ((await promises_1.default.stat(builtPath)).isFile())
+                        htmlPath = builtPath;
+                }
+                catch (error) {
+                    if (error.code !== "ENOENT")
+                        throw error;
+                }
+            }
+            const stats = await promises_1.default.stat(htmlPath);
+            if (!stats.isFile() || node_path_1.default.extname(htmlPath).toLowerCase() !== ".html") {
+                return reply.code(400).send({ error: "Not an HTML file" });
+            }
+            const directoryUrl = `/@fs/${node_path_1.default.dirname(htmlPath).split(node_path_1.default.sep).filter(Boolean).map(encodeURIComponent).join("/")}/`;
+            const html = (await promises_1.default.readFile(htmlPath, "utf8"))
+                .replace(/\b(src|href)=(['"])\/(?!\/)/gi, (_match, attribute, quote) => `${attribute}=${quote}${directoryUrl}`)
+                .replace(/<head(\s[^>]*)?>/i, (match) => `${match}<base href="${directoryUrl}">`);
+            reply.header("Cache-Control", "no-store");
+            reply.header("Referrer-Policy", "no-referrer");
+            reply.type("text/html; charset=utf-8");
+            return reply.send(html);
+        }
+        catch (error) {
+            if (["ENOENT", "ENOTDIR"].includes(error.code ?? "")) {
+                return reply.code(404).send({ error: "Website file not found" });
+            }
+            if (error.code === "EACCES") {
+                return reply.code(403).send({ error: "Website file access denied" });
+            }
+            throw error;
+        }
     });
     await app.register(static_1.default, {
         root: "/",
