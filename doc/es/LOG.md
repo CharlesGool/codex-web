@@ -79,11 +79,11 @@ Revisión de documentación y licencias: el proceso de pago ascendente declara M
 
 ## Traspaso
 
-- Rama: `feat/standardize-layout`; la rama contiene los cambios indicados en el historial de commits. Los cambios del navegador y la documentación ya están publicados.
+- Rama: `main`, actualizada por avance rápido desde `feat/standardize-layout`. Los cambios del navegador y la documentación están publicados en la rama predeterminada.
 - Completado: Se conservó la estructura original de extracción y aplicación de parches, se añadieron directorios estándar y `deploy/start.sh`, y se documentaron los límites del despliegue. Las correcciones abarcan el inicio de sesión, las IP de confianza, los archivos y sus vistas previas, los sitios estáticos, la eliminación de imágenes no enviadas, la búsqueda en conversaciones, la apertura de conversaciones en otra pestaña, la vista móvil y las funciones de escritorio no disponibles. El menú de ayuda enlaza a este fork.
 - Comprobaciones: Pasaron las pruebas anteriores de parches, sintaxis JavaScript, autenticación y tamaños de navegador. Esta revisión completó además la compilación del servidor TypeScript, las comprobaciones de sintaxis Shell y Python y las de estructura y formato de 32 documentos: 0 errores y 10 avisos sobre etiquetas de idioma y redacción no normativa. Siguen pendientes una compilación completa del cliente extraído y las pruebas con sesión iniciada en dispositivos físicos.
 - Despliegue: El último reinicio de `codex-web.service` autorizado por el usuario fue el 2026-09-27. El servicio utiliza `~/Desktop/apps/codex-web` y `deploy/start.sh`; se conserva una instalación anterior en `~/Desktop/app/codex-web` para volver atrás. Los cambios posteriores del navegador se instalaron como recursos estáticos sin reiniciar. Todo futuro reinicio manual exige una confirmación nueva y explícita tras explicar su impacto.
-- GitHub: Este trabajo se publicó en el repositorio público `CharlesGool/codex-web`, rama `feat/standardize-layout`, commit `b11f385`. Se comprobó que la rama remota coincide con el commit local.
+- GitHub: La rama `main` del repositorio público `CharlesGool/codex-web` apunta a `7347aa6`; se comprobó que el commit remoto coincide con la rama local.
 - Pendiente: Revisar la naturalidad de todas las traducciones y los textos de licencia de terceros. Probar la interfaz tras una recarga completa en un navegador autenticado, incluidos iPhone, Android y tabletas reales en vertical y horizontal. No se prevé una actualización gradual. No se encontró ningún archivo de reglas temporales del proyecto.
 - Siguiente paso: Después de publicar, completar las pruebas de dispositivos y navegador. Solicitar autorización aparte antes de otro reinicio.
 
@@ -119,6 +119,7 @@ Revisión de documentación y licencias: el proceso de pago ascendente declara M
 | `35394f5` |Elimina las imágenes no enviadas de la vista previa.|
 | `b10b9e5` |Alinee la acción de vista previa y rediseñe el inicio de sesión.|
 | `b11f385` | Completar las correcciones del navegador y la documentación del proyecto. |
-| Commit actual | Registrar el traspaso verificado en GitHub. |
+| `7347aa6` | Registrar el traspaso verificado en GitHub. |
+| Commit actual | Registrar la actualización de la rama predeterminada. |
 
 El historial de Git sigue siendo la fuente definitiva.
