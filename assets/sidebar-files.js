@@ -30,13 +30,53 @@
     document.head.append(style);
   }
 
-  // Closing a folder tab can leave the horizontally scrolling tab strip at
-  // its old offset, exposing clipped tab edges that look like stale tabs.
+  // The desktop tab exit animation occasionally stalls at a few pixels wide
+  // in a browser. Hide only tabs that remain collapsed after the animation's
+  // normal lifetime; a live tab has a minimum width of 90px.
+  const observedTabs = new WeakSet();
+  const collapsedTimers = new WeakMap();
+  const tabSizes = new ResizeObserver((entries) => {
+    for (const { target } of entries) {
+      const tab = target;
+      clearTimeout(collapsedTimers.get(tab));
+      if (tab.dataset.codexWebHiddenCollapsed === "1") {
+        if (tab.querySelector('[role="tab"][aria-selected="true"]')) {
+          tab.style.display = "";
+          delete tab.dataset.codexWebHiddenCollapsed;
+        }
+        continue;
+      }
+      if (tab.getBoundingClientRect().width >= 70) continue;
+      collapsedTimers.set(tab, setTimeout(() => {
+        if (!tab.isConnected || tab.getBoundingClientRect().width >= 70 ||
+            tab.querySelector('[role="tab"][aria-selected="true"]')) return;
+        tab.dataset.codexWebHiddenCollapsed = "1";
+        tab.style.display = "none";
+      }, 800));
+    }
+  });
+  function observeTabs() {
+    for (const tab of document.querySelectorAll(
+      '[data-app-shell-tab-strip-controller="right"] [data-app-shell-tab-controller="right"]'
+    )) {
+      if (!observedTabs.has(tab)) {
+        observedTabs.add(tab);
+        tabSizes.observe(tab);
+      }
+      if (tab.dataset.codexWebHiddenCollapsed === "1" &&
+          tab.querySelector('[role="tab"][aria-selected="true"]')) {
+        tab.style.display = "";
+        delete tab.dataset.codexWebHiddenCollapsed;
+      }
+    }
+  }
+
+  // Keep the active file tab visible after a close changes strip width.
   document.addEventListener("click", (event) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
     const closeButton = target.closest("[data-app-shell-tab-close-button]");
-    if (!closeButton?.closest('[data-tab-id^="file:folder:"]')) return;
+    if (!closeButton?.closest('[data-tab-id^="file:"]')) return;
     requestAnimationFrame(() => requestAnimationFrame(() => {
       const strip = document.querySelector('[data-app-shell-tab-strip-controller="right"]');
       if (!(strip instanceof HTMLElement)) return;
@@ -93,8 +133,14 @@
   const observer = new MutationObserver(() => {
     if (scheduled) return;
     scheduled = true;
-    requestAnimationFrame(() => { scheduled = false; mountFilesEntry(); });
+    requestAnimationFrame(() => { scheduled = false; mountFilesEntry(); observeTabs(); });
   });
-  observer.observe(document.documentElement, { childList: true, subtree: true });
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["aria-selected"],
+  });
   mountFilesEntry();
+  observeTabs();
 })();

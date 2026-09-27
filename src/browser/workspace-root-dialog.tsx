@@ -29,6 +29,9 @@ const COPY = {
     folder: "Folder",
     parent: "Parent folder",
     path: "Selected folder path",
+    go: "Go to path",
+    absolutePathError: "Enter an absolute path starting with /.",
+    directoryError: "Cannot open this folder. Check the path and permissions.",
     loading: "Loading…",
     empty: "No subfolders",
     cancel: "Cancel",
@@ -41,6 +44,9 @@ const COPY = {
     folder: "文件夹",
     parent: "上级文件夹",
     path: "选中的文件夹路径",
+    go: "前往路径",
+    absolutePathError: "请输入以 / 开头的绝对路径。",
+    directoryError: "无法打开此文件夹，请检查路径和权限。",
     loading: "正在加载…",
     empty: "没有子文件夹",
     cancel: "取消",
@@ -48,13 +54,6 @@ const COPY = {
     close: "关闭",
   },
 } as const;
-
-function errorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return String(error);
-}
 
 function WorkspaceRootDialog({
   listDirectory,
@@ -64,6 +63,8 @@ function WorkspaceRootDialog({
 }): React.ReactElement {
   const [directoryPath, setDirectoryPath] = useState<string | null>(null);
   const [userSelectedPath, setUserSelectedPath] = useState<string | null>(null);
+  const [typedPath, setTypedPath] = useState<string | null>(null);
+  const [pathError, setPathError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const labels = document.documentElement.lang.toLowerCase().startsWith("zh")
     ? COPY.zh
@@ -85,13 +86,22 @@ function WorkspaceRootDialog({
   const parentPath = directoryQuery.data?.parentPath ?? null;
   const isBusy = directoryQuery.isFetching;
   const isLoading = directoryQuery.isPending && !directoryQuery.data;
-  const queryError = directoryQuery.isError
-    ? errorMessage(directoryQuery.error)
-    : null;
+  const queryError = directoryQuery.isError ? labels.directoryError : null;
 
   function navigateTo(nextDirectoryPath: string): void {
+    setTypedPath(null);
+    setPathError(null);
     setUserSelectedPath(nextDirectoryPath);
     setDirectoryPath(nextDirectoryPath);
+  }
+
+  function navigateToTypedPath(): void {
+    const path = typedPath?.trim() ?? "";
+    if (!path.startsWith("/") || path.includes("\0")) {
+      setPathError(labels.absolutePathError);
+      return;
+    }
+    navigateTo(path);
   }
 
   useEffect(() => {
@@ -99,26 +109,29 @@ function WorkspaceRootDialog({
   }, []);
 
   useEffect(() => {
-    function handleEscape(event: KeyboardEvent): void {
+    function handleDialogKeys(event: KeyboardEvent): void {
       if (event.key !== "Escape") return;
       event.preventDefault();
       event.stopImmediatePropagation();
       onClose(null);
     }
-    window.addEventListener("keydown", handleEscape, true);
-    return () => window.removeEventListener("keydown", handleEscape, true);
+    window.addEventListener("keydown", handleDialogKeys, true);
+    return () => window.removeEventListener("keydown", handleDialogKeys, true);
   }, [onClose]);
 
   const selectedPath = userSelectedPath ?? directoryQuery.data?.directoryPath;
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
-    if (selectedPath && !isBusy) {
+    if (typedPath !== null) {
+      navigateToTypedPath();
+    } else if (selectedPath && !isBusy && !queryError) {
       onClose(selectedPath);
     }
   }
 
   const selectedPathValue = selectedPath ?? "";
+  const pathInputValue = typedPath ?? selectedPathValue;
 
   return (
     <>
@@ -332,17 +345,30 @@ function WorkspaceRootDialog({
                           "text-sm",
                           "text-token-input-foreground",
                           "outline-none",
-                          "disabled:bg-token-foreground/5",
-                          "disabled:text-token-text-secondary",
-                          "disabled:opacity-100",
                         ].join(" ")}
-                        disabled
-                        readOnly
+                        onChange={(event) => {
+                          setTypedPath(event.target.value);
+                          setPathError(null);
+                        }}
                         spellCheck={false}
-                        title={selectedPathValue}
-                        value={selectedPathValue}
+                        title={pathInputValue}
+                        value={pathInputValue}
                       />
+                      <button
+                        aria-label={labels.go}
+                        className="shrink-0 rounded-md border border-token-input-border px-2.5 py-1.5 text-sm enabled:hover:bg-token-list-hover-background"
+                        disabled={typedPath === null || isBusy}
+                        onClick={navigateToTypedPath}
+                        type="button"
+                      >
+                        {labels.go}
+                      </button>
                     </div>
+                    {pathError && (
+                      <div className="mb-2 text-sm text-token-text-error" role="alert">
+                        {pathError}
+                      </div>
+                    )}
 
                     <div
                       className={[
@@ -420,6 +446,8 @@ function WorkspaceRootDialog({
                                 data-path={entry.path}
                                 key={entry.path}
                                 onClick={() => {
+                                  setTypedPath(null);
+                                  setPathError(null);
                                   setUserSelectedPath(entry.path);
                                 }}
                                 onDoubleClick={() => {
@@ -514,7 +542,7 @@ function WorkspaceRootDialog({
                     "text-base",
                     "leading-[18px]",
                   ].join(" ")}
-                  disabled={!selectedPath || isBusy}
+                  disabled={!selectedPath || isBusy || !!queryError || typedPath !== null}
                   style={{
                     backgroundColor: "var(--color-text)",
                     color: "var(--color-surface)",
