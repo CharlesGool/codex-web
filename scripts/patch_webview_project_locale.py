@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Use server-oriented wording for project locations in the hosted Web UI."""
+"""Apply hosted Web UI wording to the extracted Chinese locale bundle."""
 
 from pathlib import Path
 
@@ -24,6 +24,11 @@ replace_once(
     ASSETS / "zh-CN-5bff6daefa6d.js",
     '"projectSetup.createProject.localDescription":`在你的电脑上编辑、运行和测试文件`',
     '"projectSetup.createProject.localDescription":`在此服务器上编辑、运行和测试文件`',
+)
+replace_once(
+    ASSETS / "zh-CN-5bff6daefa6d.js",
+    '"imageAttachment.removeAriaLabel":`移除“{filename}”`,',
+    '"imageAttachment.removeAriaLabel":`移除“{filename}”`,"imageAttachment.removeImage":`移除图片`,',
 )
 replace_once(
     ASSETS / "app-primary-6b28e06666ff.js",

@@ -1,6 +1,15 @@
 --- a/webview/assets/app-initial-236e1501144c.js
 +++ b/webview/assets/app-initial-236e1501144c.js
-@@ -330776,7 +330776,7 @@
+@@ -325865,7 +325865,7 @@
+                   `button`,
+                   {
+                     type: `button`,
+-                    className: lJ,
++                    className: K(lJ, e.className),
+                     "aria-label": e.ariaLabel,
+                     onPointerDown: (e) => {
+                       (e.preventDefault(), e.stopPropagation());
+@@ -330777,7 +330777,7 @@
        (qda = 100));
    });
  function Yda(e) {
@@ -9,7 +18,7 @@
      {
        src: n,
        filename: r,
-@@ -331071,7 +331071,8 @@
+@@ -331072,7 +331072,8 @@
      t[70] !== l ||
      t[71] !== se ||
      t[72] !== W ||
@@ -19,7 +28,7 @@
        ? ((le = (0, LJ.jsx)(boa, {
            src: P.src,
            alt: P.alt,
-@@ -331081,6 +331082,28 @@
+@@ -331082,6 +331083,33 @@
            imageDraggable: !1,
            onCloseAutoFocus: u,
            editButton: se,
@@ -36,9 +45,14 @@
 +                      },
 +                      { filename: L },
 +                    ),
++                    className: `min-w-0 px-4`,
 +                    icon: (0, LJ.jsx)(`span`, {
-+                      className: `flex size-6 items-center justify-center rounded-full bg-primary-solid text-primary-solid`,
-+                      children: (0, LJ.jsx)(qV, { className: `icon-xs` }),
++                      className: `whitespace-nowrap text-sm font-medium`,
++                      children: S.formatMessage({
++                        id: `imageAttachment.removeImage`,
++                        defaultMessage: `Remove image`,
++                        description: `Visible label for removing an unsent image from the preview`,
++                      }),
 +                    }),
 +                    onClick: () => {
 +                      (O(!1), a());
@@ -48,7 +62,7 @@
            onPreviousImage: W,
            onNextImage: ce,
            portalContainer: l,
-@@ -331096,8 +331119,9 @@
+@@ -331097,8 +331125,9 @@
          (t[71] = se),
          (t[72] = W),
          (t[73] = ce),
