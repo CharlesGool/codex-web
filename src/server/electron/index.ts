@@ -805,15 +805,18 @@ getIpcMainBridgeState().handleMenuSelection = (menuId, itemPath, windowId) => {
 };
 
 class MenuItem {
-  checked?: boolean;
+  private static nextCommandId = 1;
+  readonly commandId = MenuItem.nextCommandId++;
+  accelerator?: string;
+  checked = false;
   click?: (...args: unknown[]) => unknown;
-  enabled?: boolean;
+  enabled = true;
   id?: string;
   label?: string;
   role?: string;
   submenu?: Menu;
-  type?: string;
-  visible?: boolean;
+  type = "normal";
+  visible = true;
 
   constructor(...args: unknown[]) {
     log("new MenuItem", args);
@@ -821,20 +824,19 @@ class MenuItem {
     if (!options || typeof options !== "object") {
       return;
     }
-    this.checked =
-      typeof options.checked === "boolean" ? options.checked : undefined;
+    this.accelerator =
+      typeof options.accelerator === "string" ? options.accelerator : undefined;
+    this.checked = options.checked === true;
     this.click =
       typeof options.click === "function"
         ? (options.click as (...args: unknown[]) => unknown)
         : undefined;
-    this.enabled =
-      typeof options.enabled === "boolean" ? options.enabled : undefined;
+    this.enabled = options.enabled !== false;
     this.id = typeof options.id === "string" ? options.id : undefined;
     this.label = typeof options.label === "string" ? options.label : undefined;
     this.role = typeof options.role === "string" ? options.role : undefined;
-    this.type = typeof options.type === "string" ? options.type : undefined;
-    this.visible =
-      typeof options.visible === "boolean" ? options.visible : undefined;
+    this.type = typeof options.type === "string" ? options.type : "normal";
+    this.visible = options.visible !== false;
 
     const submenu = options.submenu;
     if (Array.isArray(submenu)) {
@@ -843,6 +845,11 @@ class MenuItem {
     }
     if (submenu instanceof Menu) {
       this.submenu = submenu;
+    }
+    // Electron handles role-only actions internally; this browser bridge cannot.
+    // Keep them visible in the menu, but do not expose a click that would throw.
+    if (!this.click && !this.submenu && this.type !== "separator") {
+      this.enabled = false;
     }
   }
 }
@@ -863,7 +870,37 @@ class Notification {
   }
 }
 
+const pendingDirectoryDialogs = new Map<string, {
+  resolve: (result: { canceled: boolean; filePaths: string[] }) => void;
+  timeout: ReturnType<typeof setTimeout>;
+  windowId: number;
+}>();
+
 const dialog = {
+  showOpenDialog(...args: unknown[]): Promise<{ canceled: boolean; filePaths: string[] }> {
+    const window = args[0] instanceof BrowserWindow
+      ? args[0]
+      : BrowserWindow.getFocusedWindow();
+    const options = (args[0] instanceof BrowserWindow ? args[1] : args[0]) as
+      | { properties?: string[] }
+      | undefined;
+    if (!window || window.isDestroyed() || !options?.properties?.includes("openDirectory")) {
+      return Promise.resolve({ canceled: true, filePaths: [] });
+    }
+    const requestId = randomUUID();
+    return new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        pendingDirectoryDialogs.delete(requestId);
+        resolve({ canceled: true, filePaths: [] });
+      }, 120_000);
+      timeout.unref();
+      pendingDirectoryDialogs.set(requestId, { resolve, timeout, windowId: window.id });
+      (window.webContents as unknown as StubWebContents).send(
+        "codex-web:dialog-open-directory",
+        { requestId },
+      );
+    });
+  },
   async showMessageBox(...args: unknown[]): Promise<{ response: number }> {
     log("dialog.showMessageBox", args);
     return { response: 0 };
@@ -911,6 +948,17 @@ const net = {
 
 const autoUpdater = createEmitterStub("autoUpdater");
 const ipcMain = createIpcMainStub();
+ipcMain.on("codex-web:dialog-open-directory-result", (event: unknown, requestId: unknown, path: unknown) => {
+  if (typeof requestId !== "string") return;
+  const pending = pendingDirectoryDialogs.get(requestId);
+  if (!pending || pending.windowId !== (event as IpcMainEvent).processId) return;
+  pendingDirectoryDialogs.delete(requestId);
+  clearTimeout(pending.timeout);
+  pending.resolve({
+    canceled: typeof path !== "string" || path.length === 0,
+    filePaths: typeof path === "string" && path.length > 0 ? [path] : [],
+  });
+});
 const nativeTheme = {
   ...createEmitterStub("nativeTheme"),
   shouldUseDarkColors: false,

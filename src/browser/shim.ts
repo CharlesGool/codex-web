@@ -190,6 +190,23 @@ function isUnsupportedBrowserPanelMessage(
 
 function handleIncomingMessage(message: MainToRendererMessage): void {
   if (message.type === "ipc-main-event") {
+    if (message.channel === "codex-web:dialog-open-directory") {
+      const request = message.args[0];
+      if (isRecord(request) && typeof request.requestId === "string") {
+        openSelectWorkspaceRootDialog({
+          listDirectory: requestWorkspaceDirectoryEntries,
+        })
+          .catch(() => null)
+          .then((path) => {
+            enqueueMessage({
+              type: "ipc-renderer-send",
+              channel: "codex-web:dialog-open-directory-result",
+              args: [request.requestId, path],
+            });
+          });
+      }
+      return;
+    }
     if (message.channel === "codex-web:menu-open") {
       showBrowserMenu(message.args[0] as Parameters<typeof showBrowserMenu>[0],
         (menuId, itemPath) => enqueueMessage({
@@ -639,6 +656,8 @@ export const contextBridge = {
 
 export const webUtils = {
   getPathForFile(_file: File): string | null {
-    return unimplemented("webUtils.getPathForFile");
+    // Browser File objects do not expose a filesystem path. The webview falls
+    // back to copying their bytes into its attachment store when this is null.
+    return null;
   },
 };

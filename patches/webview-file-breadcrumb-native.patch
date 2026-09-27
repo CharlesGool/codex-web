@@ -1,0 +1,190 @@
+--- a/webview/assets/review-file-source-breadcrumb-ea75e43b8a53.js
++++ b/webview/assets/review-file-source-breadcrumb-ea75e43b8a53.js
+@@ -2345,6 +2345,14 @@
+       (Q = w()),
+       (cn = 500));
+   });
++function codexWebBreadcrumbRoot(cwd, filePath) {
++  if (typeof filePath !== `string` || !filePath.startsWith(`/`)) return null;
++  const fileParts = filePath.split(`/`).filter(Boolean);
++  const cwdParts = typeof cwd === `string` ? cwd.split(`/`).filter(Boolean) : [];
++  let count = 0;
++  while (count < cwdParts.length && count < fileParts.length - 1 && cwdParts[count] === fileParts[count]) count++;
++  return `/${(count ? cwdParts.slice(0, count) : fileParts.slice(0, 1)).join(`/`)}`;
++}
+ function un(e) {
+   let t = (0, vn.c)(36),
+     {
+@@ -2374,20 +2382,25 @@
+   ) {
+     y = Symbol.for(`react.early_return_sentinel`);
+     bb0: {
++      let root = l;
++      if (a != null && (root == null || c({ cwd: n, path: a, workspaceRoot: root }) == null))
++        root = codexWebBreadcrumbRoot(n, a);
+       let e =
+-        a == null ? [hn(l ?? n)] : u({ cwd: n, path: a, workspaceRoot: l });
++        a == null
++          ? [root ?? n ?? `/`]
++          : u({ cwd: n, path: a, workspaceRoot: root });
+       if (e.length === 0) {
+         y = null;
+         break bb0;
+       }
+       let o = e.join(`/`),
+-        s = a == null ? o : Oe(he({ cwd: n, path: a, workspaceRoot: l })),
++        s = a == null ? root ?? n ?? o : Oe(he({ cwd: n, path: a, workspaceRoot: root })),
+         p;
+       t[13] !== n || t[14] !== a || t[15] !== l
+         ? ((p =
+-            a == null || l == null
++            a == null || root == null
+               ? null
+-              : c({ cwd: n, path: a, workspaceRoot: l })),
++              : c({ cwd: n, path: a, workspaceRoot: root })),
+           (t[13] = n),
+           (t[14] = a),
+           (t[15] = l),
+@@ -2421,7 +2434,7 @@
+             {
+               className: `flex shrink-0 items-center gap-1`,
+               children: [
+-                o == null || r == null || i == null || l == null
++                a || o == null || r == null || i == null || root == null
+                   ? (0, $.jsx)(`span`, { className: s, children: t })
+                   : (0, $.jsx)(dn, {
+                       activePath: o.activePath,
+@@ -2431,7 +2444,7 @@
+                       label: t,
+                       labelClassName: s,
+                       onSelectFile: i,
+-                      root: l,
++                      root,
+                     }),
+                 a
+                   ? null
+@@ -2525,115 +2538,20 @@
+   );
+ }
+ function dn(e) {
+-  let t = (0, vn.c)(29),
+-    {
++  let {
+       activePath: n,
+-      directoryPath: r,
+       hostId: i,
+-      shouldExpandActivePath: a,
+       label: s,
+       labelClassName: c,
+-      onSelectFile: l,
+       root: u,
+-    } = e,
+-    [d, f] = (0, yn.useState)(!1),
+-    p;
+-  t[0] === u ? (p = t[1]) : ((p = o(u)), (t[0] = u), (t[1] = p));
+-  let m = a ? `workspace` : `file`,
+-    h;
+-  t[2] !== n || t[3] !== u
+-    ? ((h = n == null ? u : Te(u, ...n.split(`/`))),
+-      (t[2] = n),
+-      (t[3] = u),
+-      (t[4] = h))
+-    : (h = t[4]);
+-  let g;
+-  t[5] === c
+-    ? (g = t[6])
+-    : ((g = we(
+-        c,
+-        `cursor-interaction outline-none hover:text-default focus-visible:ring-2 focus-visible:ring-ring`,
+-      )),
+-      (t[5] = c),
+-      (t[6] = g));
+-  let v;
+-  t[7] !== s || t[8] !== g
+-    ? ((v = (0, $.jsx)(j, {
+-        asChild: !0,
+-        children: (0, $.jsx)(`button`, {
+-          type: `button`,
+-          className: g,
+-          children: s,
+-        }),
+-      })),
+-      (t[7] = s),
+-      (t[8] = g),
+-      (t[9] = v))
+-    : (v = t[9]);
+-  let y;
+-  t[10] !== i || t[11] !== p || t[12] !== m || t[13] !== h || t[14] !== v
+-    ? ((y = (0, $.jsx)(We, {
+-        cwd: p,
+-        hostId: i,
+-        openMode: m,
+-        path: h,
+-        children: v,
+-      })),
+-      (t[10] = i),
+-      (t[11] = p),
+-      (t[12] = m),
+-      (t[13] = h),
+-      (t[14] = v),
+-      (t[15] = y))
+-    : (y = t[15]);
+-  let b;
+-  t[16] === l
+-    ? (b = t[17])
+-    : ((b = (e, t) => {
+-        (f(!1), l(e, t));
+-      }),
+-      (t[16] = l),
+-      (t[17] = b));
+-  let x;
+-  t[18] !== n ||
+-  t[19] !== r ||
+-  t[20] !== i ||
+-  t[21] !== u ||
+-  t[22] !== a ||
+-  t[23] !== b
+-    ? ((x = (0, $.jsx)(F, {
+-        className: `h-80`,
+-        opaque: !0,
+-        sideOffset: 1,
+-        size: `large`,
+-        children: (0, $.jsx)(fn, {
+-          activePath: n,
+-          directoryPath: r,
+-          hostId: i,
+-          shouldExpandActivePath: a,
+-          onSelectFile: b,
+-          root: u,
+-        }),
+-      })),
+-      (t[18] = n),
+-      (t[19] = r),
+-      (t[20] = i),
+-      (t[21] = u),
+-      (t[22] = a),
+-      (t[23] = b),
+-      (t[24] = x))
+-    : (x = t[24]);
+-  let S;
+-  return (
+-    t[25] !== d || t[26] !== y || t[27] !== x
+-      ? ((S = (0, $.jsxs)(_, { open: d, onOpenChange: f, children: [y, x] })),
+-        (t[25] = d),
+-        (t[26] = y),
+-        (t[27] = x),
+-        (t[28] = S))
+-      : (S = t[28]),
+-    S
+-  );
++    } = e;
++  let folderPath = n == null ? u : Te(u, ...n.split(`/`));
++  return (0, $.jsx)(`button`, {
++    type: `button`,
++    className: we(c, `cursor-interaction outline-none hover:text-default focus-visible:ring-2 focus-visible:ring-ring`),
++    onClick: () => window.codexWebOpenFolder?.(folderPath, i),
++    children: s,
++  });
+ }
+ function fn(e) {
+   let t = (0, vn.c)(39),

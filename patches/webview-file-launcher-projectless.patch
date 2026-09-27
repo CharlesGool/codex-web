@@ -1,0 +1,50 @@
+--- a/webview/assets/thread-app-shell-chrome-b2c6cb2181cc.js
++++ b/webview/assets/thread-app-shell-chrome-b2c6cb2181cc.js
+@@ -485,7 +485,7 @@
+     F;
+   t[4] === de ? (F = t[5]) : ((F = { enabled: de }), (t[4] = de), (t[5] = F));
+   let fe = K(i === `new-tab` ? Va : ua, ue, F),
+-    pe = ee !== `projectless` && O != null,
++    pe = !0,
+     ge = A != null && !1,
+     _e = A != null && !te && !Le(),
+     ve = T,
+@@ -554,13 +554,12 @@
+       }) != null && r?.();
+     },
+     Ae = (e) => {
+-      O != null &&
+-        (m(d, null, {
+-          hostId: b.id,
+-          target: c,
+-          replaceTabId: e,
+-          workspaceRoot: O,
+-        }),
++      (m(d, null, {
++        hostId: b.id,
++        target: c,
++        replaceTabId: e,
++        workspaceRoot: O ?? void 0,
++      }),
+         r?.());
+     },
+     je = (e) => {
+@@ -568,6 +567,18 @@
+     },
+     Me = Wa,
+     Ne;
++  window.codexWebOpenFiles = () =>
++    m(d, null, { hostId: b.id, target: `right`, workspaceRoot: O ?? void 0 });
++  window.codexWebOpenFolder = (folderPath, hostId) => {
++    if (typeof folderPath !== `string` || !folderPath.startsWith(`/`)) return;
++    m(d, null, {
++      hostId: hostId ?? b.id,
++      tabId: `file:folder:${folderPath}`,
++      title: folderPath.split(`/`).filter(Boolean).at(-1) ?? folderPath,
++      target: `right`,
++      workspaceRoot: folderPath,
++    });
++  };
+   t[6] !== b || t[7] !== T || t[8] !== d || t[9] !== O
+     ? ((Ne = (e, t) => {
+         switch (e.type) {

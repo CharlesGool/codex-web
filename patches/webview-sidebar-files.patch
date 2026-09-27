@@ -1,0 +1,10 @@
+--- a/webview/index.html
++++ b/webview/index.html
+@@ -7,6 +7,7 @@
+     <!-- PROD_CSP_TAG_HERE -->
+     <script src="./secure-context-polyfill.js"></script>
+     <script defer src="./logout-button.js"></script>
++    <script defer src="./sidebar-files.js"></script>
+     <script type="module" src="./assets/preload.js"></script>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

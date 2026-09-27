@@ -1,0 +1,11 @@
+--- a/webview/assets/app-primary-6b28e06666ff.js
++++ b/webview/assets/app-primary-6b28e06666ff.js
+@@ -372380,7 +372380,7 @@
+       if (t.length === 0) return;
+       let s = window.electronBridge?.getPathForFile,
+         l = ZYt(t, s, n, a),
+-        u = r ? t.filter((e) => e.size > 0 && SH(e, s) == null) : [];
++        u = t.filter((e) => e.size > 0 && SH(e, s) == null);
+       if (u.length > 0) {
+         (async () => {
+           try {

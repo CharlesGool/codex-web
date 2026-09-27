@@ -1,0 +1,62 @@
+--- a/webview/assets/review-file-source-item-6a924fa237d9.js
++++ b/webview/assets/review-file-source-item-6a924fa237d9.js
+@@ -2132,6 +2132,15 @@
+     oe
+   );
+ }
++const codexWebFolderRootLists = new Map();
++function codexWebFolderRoots(path) {
++  let roots = codexWebFolderRootLists.get(path);
++  if (roots == null) {
++    roots = [path];
++    codexWebFolderRootLists.set(path, roots);
++  }
++  return roots;
++}
+ function vi(e) {
+   let t = (0, Ri.c)(48),
+     {
+@@ -2154,7 +2163,7 @@
+     y = Nt(bt),
+     b = S(),
+     x = J(Dt),
+-    C = J($e),
++    C = s == null && m != null ? codexWebFolderRoots(m) : J($e),
+     w = r ?? (x == null ? null : p(x)),
+     T = s != null && (c || h || g || v),
+     E = J(Ze),
+@@ -2307,13 +2316,16 @@
+     ? ((B =
+         o == null
+           ? null
+-          : (0, $.jsx)(Vn, {
+-              activeFilePath: s,
+-              autoFocusSearch: s == null,
+-              hostId: a,
+-              onSelectFile: o,
+-              roots: C,
+-              type: `workspace`,
++          : (0, $.jsx)(`div`, {
++              className: `codex-web-file-tree`,
++              children: (0, $.jsx)(Vn, {
++                activeFilePath: s,
++                autoFocusSearch: s == null,
++                hostId: a,
++                onSelectFile: o,
++                roots: C,
++                type: `workspace`,
++              }),
+             })),
+       (t[37] = a),
+       (t[38] = o),
+@@ -2324,8 +2336,8 @@
+   let V;
+   t[42] !== z || t[43] !== B
+     ? ((V = (0, $.jsxs)(`div`, {
+-        className: `flex min-h-0 flex-1`,
+-        children: [z, B],
++        className: `codex-web-file-view flex min-h-0 flex-1`,
++        children: [B, z],
+       })),
+       (t[42] = z),
+       (t[43] = B),

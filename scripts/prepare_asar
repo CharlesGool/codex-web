@@ -45,8 +45,14 @@ patch --batch --forward --strip 1 --directory scratch/asar < patches/preload-dis
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-safe-header-left.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-catalog-stalled-pagination.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-artifact-file-actions.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-sidebar-files.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-file-breadcrumb-native.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-file-tab-folder-root.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-file-launcher-projectless.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-browser-file-drop.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/app-host-json-rpc.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/app-host-browser-windows.patch
+python3 scripts/patch_webview_project_locale.py
 rm -rf scratch/asar/node_modules/better-sqlite3
 ./scripts/prepare_native_terminal
 node ./scripts/compress_webview_assets.mjs

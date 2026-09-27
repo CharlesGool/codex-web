@@ -22,6 +22,32 @@ export type WorkspaceDirectoryEntries = {
 
 const TITLE_ID = "codex-web-workspace-root-dialog-title";
 const DESCRIPTION_ID = "codex-web-workspace-root-dialog-description";
+const COPY = {
+  en: {
+    title: "Select source folder",
+    description: "Choose a folder on this server that Codex can read and edit.",
+    folder: "Folder",
+    parent: "Parent folder",
+    path: "Selected folder path",
+    loading: "Loading…",
+    empty: "No subfolders",
+    cancel: "Cancel",
+    choose: "Use this folder",
+    close: "Close",
+  },
+  zh: {
+    title: "选择源文件夹",
+    description: "选择这台服务器上的文件夹，供 Codex 读取和编辑。",
+    folder: "文件夹",
+    parent: "上级文件夹",
+    path: "选中的文件夹路径",
+    loading: "正在加载…",
+    empty: "没有子文件夹",
+    cancel: "取消",
+    choose: "选择此文件夹",
+    close: "关闭",
+  },
+} as const;
 
 function errorMessage(error: unknown): string {
   if (error instanceof Error) {
@@ -39,6 +65,9 @@ function WorkspaceRootDialog({
   const [directoryPath, setDirectoryPath] = useState<string | null>(null);
   const [userSelectedPath, setUserSelectedPath] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
+  const labels = document.documentElement.lang.toLowerCase().startsWith("zh")
+    ? COPY.zh
+    : COPY.en;
 
   const directoryQuery = useQuery({
     placeholderData: keepPreviousData,
@@ -70,15 +99,14 @@ function WorkspaceRootDialog({
   }, []);
 
   useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent): void {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        onClose(null);
-      }
+    function handleEscape(event: KeyboardEvent): void {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      onClose(null);
     }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleEscape, true);
+    return () => window.removeEventListener("keydown", handleEscape, true);
   }, [onClose]);
 
   const selectedPath = userSelectedPath ?? directoryQuery.data?.directoryPath;
@@ -133,9 +161,16 @@ function WorkspaceRootDialog({
           "w-[520px]",
         ].join(" ")}
         data-state="open"
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            onClose(null);
+          }
+        }}
         ref={dialogRef}
         role="dialog"
-        style={{ pointerEvents: "auto" }}
+        style={{ pointerEvents: "auto", backgroundColor: "var(--color-surface)" }}
         tabIndex={-1}
       >
         <form
@@ -186,10 +221,10 @@ function WorkspaceRootDialog({
                     ].join(" ")}
                     id={TITLE_ID}
                   >
-                    Add remote project
+                    {labels.title}
                   </div>
                   <div className={["sr-only"].join(" ")} id={DESCRIPTION_ID}>
-                    Choose a folder on the Codex Web host to add as a project.
+                    {labels.description}
                   </div>
                 </div>
               </div>
@@ -211,7 +246,7 @@ function WorkspaceRootDialog({
                     " ",
                   )}
                 >
-                  Select folder
+                  {labels.folder}
                 </span>
                 <div
                   className={[
@@ -242,7 +277,7 @@ function WorkspaceRootDialog({
                       ].join(" ")}
                     >
                       <button
-                        aria-label="Enclosing folder"
+                        aria-label={labels.parent}
                         className={[
                           "border-token-border",
                           "user-select-none",
@@ -283,7 +318,7 @@ function WorkspaceRootDialog({
                         <UpIcon />
                       </button>
                       <input
-                        aria-label="Selected folder path"
+                        aria-label={labels.path}
                         className={[
                           "w-full",
                           "min-w-0",
@@ -335,7 +370,7 @@ function WorkspaceRootDialog({
                               "text-token-description-foreground",
                             ].join(" ")}
                           >
-                            Loading...
+                            {labels.loading}
                           </div>
                         ) : queryError ? (
                           <div
@@ -357,7 +392,7 @@ function WorkspaceRootDialog({
                               "text-token-description-foreground",
                             ].join(" ")}
                           >
-                            No folders
+                            {labels.empty}
                           </div>
                         ) : (
                           entries.map((entry) => {
@@ -453,7 +488,7 @@ function WorkspaceRootDialog({
                   onClick={() => onClose(null)}
                   type="button"
                 >
-                  Cancel
+                  {labels.cancel}
                 </button>
                 <button
                   className={[
@@ -480,9 +515,13 @@ function WorkspaceRootDialog({
                     "leading-[18px]",
                   ].join(" ")}
                   disabled={!selectedPath || isBusy}
+                  style={{
+                    backgroundColor: "var(--color-text)",
+                    color: "var(--color-surface)",
+                  }}
                   type="submit"
                 >
-                  Add project
+                  {labels.choose}
                 </button>
               </div>
             </div>
@@ -490,7 +529,7 @@ function WorkspaceRootDialog({
         </form>
 
         <button
-          aria-label="Close"
+          aria-label={labels.close}
           className={[
             "no-drag",
             "absolute",
@@ -516,15 +555,35 @@ function WorkspaceRootDialog({
   );
 }
 
-function ensureHost(): HTMLElement {
+function ensureHost(): { element: HTMLElement; restore: () => void } {
   const DIALOG_ID = "codex-web-workspace-root-dialog";
   let element = document.getElementById(DIALOG_ID);
+  const parentDialog = Array.from(document.querySelectorAll<HTMLElement>("[role='dialog']"))
+    .filter((dialog) => !dialog.closest(`#${DIALOG_ID}`))
+    .at(-1);
+  const previousOverflow = parentDialog?.style.overflow ?? "";
+  const previousZIndex = parentDialog?.style.zIndex ?? "";
   if (!element) {
     element = document.createElement("div");
     element.id = DIALOG_ID;
-    document.body.append(element);
+    (parentDialog ?? document.body).append(element);
   }
-  return element;
+  // Radix clips nested content and its backdrop can cover a child dialog.
+  // Raise the parent only while the folder picker is open.
+  if (parentDialog) {
+    parentDialog.style.overflow = "visible";
+    parentDialog.style.zIndex = "60";
+  }
+  return {
+    element,
+    restore: () => {
+      element.remove();
+      if (parentDialog) {
+        parentDialog.style.overflow = previousOverflow;
+        parentDialog.style.zIndex = previousZIndex;
+      }
+    },
+  };
 }
 
 type WorkspaceRootDialogOptions = {
@@ -561,7 +620,8 @@ export async function openSelectWorkspaceRootDialog({
     };
   })();
 
-  const reactRoot = createRoot(ensureHost());
+  const host = ensureHost();
+  const reactRoot = createRoot(host.element);
   reactRoot.render(
     <QueryClientProvider client={queryClient}>
       <WorkspaceRootDialog listDirectory={listDirectory} onClose={resolveFn} />
@@ -571,6 +631,7 @@ export async function openSelectWorkspaceRootDialog({
   const result = await promise;
 
   reactRoot.unmount();
+  host.restore();
 
   if (activeElement instanceof HTMLElement) {
     activeElement.focus();
