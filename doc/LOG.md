@@ -79,13 +79,14 @@ Documentation and licensing review: The upstream checkout declares MIT in `packa
 
 ## Handoff
 
-- Branch: `feat/standardize-layout`; the work branch contains the five commits listed in Commit History. The current browser and documentation changes are being prepared for publication.
+- Branch: `feat/standardize-layout`; the work branch contains the commits listed in Commit History. The browser and documentation changes have been published.
 - Completed: Kept the upstream extract-then-patch layout, added standard project directories and a new `deploy/start.sh`, and documented the deployment boundaries. Browser fixes cover login and trusted IPs, file actions and previews, static website previews, unsent image removal, conversation search, opening chats in a browser tab, mobile viewport sizing, and unavailable desktop-only features. The help menu links to this fork.
 - Checks: Earlier patch replay, JavaScript syntax, authentication, and browser-size checks passed. This pass also completed the TypeScript server build, shell and Python syntax checks, and the 32-document structure and format checks: 0 errors, with 10 document warnings for language labels and non-normative wording. A full extracted-client rebuild and signed-in checks on physical devices remain outstanding.
 - Deployment: The last user-authorized restart of `codex-web.service` was on 2026-09-27. The service uses `~/Desktop/apps/codex-web` and `deploy/start.sh`; an earlier deployment remains at `~/Desktop/app/codex-web` for rollback. Later browser-only changes were installed as static assets without another restart. Any future operator-initiated restart requires a fresh, explicit user confirmation after the impact is stated.
-- GitHub: This work is on `feat/standardize-layout` and targets the public `CharlesGool/codex-web` repository. Check the remote branch before deploying.
+- GitHub: This work is published to the public `CharlesGool/codex-web` repository on `feat/standardize-layout` at `b11f385`. The remote branch was verified against the local commit.
 - Remaining: Review natural wording in all translated documents and the third-party license texts. Test the changed UI after a hard refresh in an authenticated browser, including physical iPhone, Android, and tablet portrait and landscape layouts. No rolling update is planned. No temporary project rules file was found.
 - Next action: After publication, run the outstanding device and browser checks. Ask separately before any later service restart.
+
 ## Changelog
 
 ### 0.0.1 (unreleased; work updated 2026-09-27)
@@ -117,6 +118,7 @@ Documentation and licensing review: The upstream checkout declares MIT in `packa
 | `1f98f69` | Record the standardization audit. |
 | `35394f5` | Remove unsent images from the preview. |
 | `b10b9e5` | Align the preview action and redesign login. |
-| Current commit | Finalize browser fixes and project documentation. |
+| `b11f385` | Finalize browser fixes and project documentation. |
+| Current commit | Record the verified GitHub handoff. |
 
 The Git log remains the authoritative history.

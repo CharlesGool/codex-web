@@ -79,13 +79,14 @@ Examen de la documentation et des licences : la caisse en amont déclare MIT da
 
 ## Passation
 
-- Branche: `feat/standardize-layout`; la branche de travail contient les cinq commits répertoriés dans l'historique. Les changements du navigateur et de la documentation sont en préparation pour publication.
+- Branche: `feat/standardize-layout`; la branche contient les modifications répertoriées dans l’historique des commits. Les changements du navigateur et de la documentation ont été publiés.
 - Terminé: La structure d'extraction puis de correctifs héritée du projet a été conservée; les répertoires standard et `deploy/start.sh` ont été ajoutés, et les limites du déploiement documentées. Les correctifs concernent la connexion, les IP de confiance, les fichiers et leurs aperçus, les sites statiques, la suppression des images non envoyées, la recherche dans les conversations, l'ouverture d'une conversation dans un autre onglet, l'affichage mobile et les fonctions de bureau indisponibles. Le menu d'aide renvoie vers ce fork.
 - Vérifications: Les contrôles antérieurs des correctifs, de la syntaxe JavaScript, de l’authentification et des tailles de fenêtre ont réussi. Cette passe a aussi terminé la compilation du serveur TypeScript, les contrôles de syntaxe Shell et Python et les contrôles de structure et de format des 32 documents: 0 erreur et 10 avertissements sur les libellés de langue et les formulations non normatives. La reconstruction complète du client extrait et les essais connectés sur appareils réels restent à faire.
 - Déploiement: Le dernier redémarrage de `codex-web.service` autorisé par l'utilisateur date du 2026-09-27. Le service utilise `~/Desktop/apps/codex-web` et `deploy/start.sh`; l'ancien déploiement reste dans `~/Desktop/app/codex-web` pour permettre un retour en arrière. Les modifications ultérieures du navigateur ont été installées comme ressources statiques sans autre redémarrage. Tout nouveau redémarrage manuel exige une confirmation explicite après présentation de ses conséquences.
-- GitHub: Ce travail se trouve sur `feat/standardize-layout` et vise le dépôt public `CharlesGool/codex-web`. Vérifier la branche distante avant tout déploiement.
+- GitHub: Ce travail est publié dans le dépôt public `CharlesGool/codex-web`, sur `feat/standardize-layout`, au commit `b11f385`. La branche distante a été comparée au commit local.
 - À faire: Relire la qualité de toutes les traductions et les textes des licences tierces. Tester l’interface après actualisation forcée dans un navigateur connecté, notamment sur de vrais iPhone, appareils Android et tablettes en mode portrait et paysage. Aucune mise à jour progressive n’est prévue. Aucun fichier de règles temporaires du projet n’a été trouvé.
 - Prochaine étape: Après publication, effectuer les essais sur appareils et navigateurs. Demander une nouvelle autorisation avant tout redémarrage.
+
 ## Historique des modifications
 
 ### 0.0.1 (inédit ; travail mis à jour le 2026-09-27)
@@ -110,13 +111,14 @@ Examen de la documentation et des licences : la caisse en amont déclare MIT da
 
 ## Historique des commits
 
-|Commettre|Résumé|
+| Commit | Résumé |
 | --- | --- |
 | `b27d4e4` |Remplacez les actions de bureau non prises en charge dans l'interface utilisateur du navigateur.|
 | `33d3851` |Téléchargez les archives locales liées en un clic.|
 | `1f98f69` |Enregistrez l’audit de normalisation.|
 | `35394f5` |Supprimez les images non envoyées de l'aperçu.|
 | `b10b9e5` |Alignez l'action d'aperçu et repensez la connexion.|
-| Commit actuel | Terminer les correctifs du navigateur et la documentation du projet. |
+| `b11f385` | Terminer les correctifs du navigateur et la documentation du projet. |
+| Commit actuel | Consigner la passation vérifiée sur GitHub. |
 
 Le journal Git reste la référence complète de l’historique.
