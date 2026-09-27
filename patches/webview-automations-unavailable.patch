@@ -1,0 +1,48 @@
+--- a/webview/assets/app-initial-236e1501144c.js
++++ b/webview/assets/app-initial-236e1501144c.js
+@@ -409343,38 +409343,13 @@
+   }
+ }
+ function KTo() {
+-  let e = (0, L4.c)(4),
+-    t;
+-  e[0] === Symbol.for(`react.memo_cache_sentinel`)
+-    ? ((t = { name: `automations.local` }), (e[0] = t))
+-    : (t = e[0]);
+-  let n = mb(yX, t),
+-    r;
+-  e[1] === Symbol.for(`react.memo_cache_sentinel`)
+-    ? ((r = { name: `automations.cloud` }), (e[1] = r))
+-    : (r = e[1]);
+-  let i = mb(yX, r);
+-  if (n.isCapable || i.isCapable) {
+-    let t;
+-    return (
+-      e[2] === Symbol.for(`react.memo_cache_sentinel`)
+-        ? ((t = (0, z4.jsx)(R4.Suspense, {
+-            fallback: (0, z4.jsx)(wCo, {}),
+-            children: (0, z4.jsx)(ZSo, {}),
+-          })),
+-          (e[2] = t))
+-        : (t = e[2]),
+-      t
+-    );
+-  }
+-  if (n.isLoading || i.isLoading) return null;
+-  let a;
+-  return (
+-    e[3] === Symbol.for(`react.memo_cache_sentinel`)
+-      ? ((a = (0, z4.jsx)(oT, { to: `/`, replace: !0 })), (e[3] = a))
+-      : (a = e[3]),
+-    a
+-  );
++  return (0, z4.jsx)(`div`, {
++    className: `flex min-h-48 items-center justify-center text-secondary`,
++    role: `status`,
++    children: navigator.language.startsWith(`zh`)
++      ? `计划任务在当前网页版不可用`
++      : `Scheduled tasks are unavailable in this web deployment`,
++  });
+ }
+ function I4(e) {
+   let t = (0, L4.c)(4),

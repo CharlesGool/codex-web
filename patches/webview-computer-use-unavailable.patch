@@ -1,0 +1,49 @@
+--- a/webview/assets/app-initial-236e1501144c.js
++++ b/webview/assets/app-initial-236e1501144c.js
+@@ -407318,13 +407318,14 @@
+             (
+               await W(
+                 async () => {
+-                  let { ComputerUseSettings: e } = await import(
+-                    `./computer-use-settings-9b639578c95b.js`
++                  let { PetsSettingsRoute: e } = await import(
++                    `./pets-settings-route-66d8bd66f50e.js`
+                   );
+                   return { ComputerUseSettings: e };
+                 },
+                 __vite__mapDeps([
+-                  784, 1, 426, 427, 536, 578, 698, 716, 785, 786,
++                  750, 1, 426, 427, 751, 752, 724, 753, 599, 754, 716, 699, 728,
++                  755,
+                 ]),
+                 import.meta.url,
+               )
+--- a/webview/assets/app-primary-6b28e06666ff.js
++++ b/webview/assets/app-primary-6b28e06666ff.js
+@@ -316998,25 +316998,7 @@
+       (t[10] = o),
+       (t[11] = _))
+     : (_ = t[11]);
+-  let v;
+-  t[12] !== u || t[13] !== a
+-    ? ((v = a
+-        ? (0, w4.jsx)(Cp.Item, {
+-            LeftIcon: wme,
+-            onSelect: () => {
+-              u(`/settings/computer-use`);
+-            },
+-            children: (0, w4.jsx)(Y, {
+-              id: `sidebarHelp.setUpChromeExtension`,
+-              defaultMessage: `Set up Chrome extension`,
+-              description: `Menu item that opens Chrome extension setup`,
+-            }),
+-          })
+-        : null),
+-      (t[12] = u),
+-      (t[13] = a),
+-      (t[14] = v))
+-    : (v = t[14]);
++  let v = null;
+   let y;
+   t[15] !== u || t[16] !== s
+     ? ((y = s

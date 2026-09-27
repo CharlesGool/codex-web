@@ -1,0 +1,99 @@
+--- a/webview/assets/app-initial-236e1501144c.js
++++ b/webview/assets/app-initial-236e1501144c.js
+@@ -301038,8 +301038,8 @@
+         },
+         openInNewWindow: {
+           id: `threadHeader.openInNewWindow`,
+-          defaultMessage: `Open in new window`,
+-          description: `Menu item to open the current chat in a new window`,
++          defaultMessage: `Open in new tab`,
++          description: `Menu item to open the current chat in a new browser tab`,
+         },
+         moreActions: {
+           id: `threadHeader.moreActions`,
+@@ -309762,7 +309762,7 @@
+         titleIntlId: `codex.command.openThreadInNewWindow`,
+         descriptionIntlId: `codex.commandDescription.openThreadInNewWindow`,
+         commandMenuGroupKey: `thread`,
+-        commandMenu: !0,
++        commandMenu: !1,
+         commandMenuFeature: `codex`,
+         electron: {
+           menuTitle: `Open in New Window`,
+--- a/webview/assets/app-primary-6b28e06666ff.js
++++ b/webview/assets/app-primary-6b28e06666ff.js
+@@ -148362,12 +148362,13 @@
+   let r = Vs(n.getAttribute(`data-app-action-sidebar-thread-id`));
+   if (r == null) return;
+   let i = r.kind === `local` ? e.get(ul, r.threadId) : null;
+-  if (Wge(t) && i != null && e.get(tb, `459748632`)) {
+-    let e = Ms(i),
+-      r = n.getAttribute(`data-app-action-sidebar-thread-host-id`);
+-    (X_.dispatchMessage(`open-in-new-window`, {
+-      path: r && r !== `local` ? Gfe(e, r) : e,
+-    }),
++  if (
++    Wge(t) &&
++    i != null &&
++    e.get(tb, `459748632`) &&
++    (n.getAttribute(`data-app-action-sidebar-thread-host-id`) ?? `local`) === `local`
++  ) {
++    (CodexWebOpenThreadInTab(i, `local`),
+       t.preventDefault(),
+       t.stopPropagation());
+     return;
+@@ -156412,6 +156413,10 @@
+ var BAn = t(() => {
+   (Th(), KT(), Sa(), xS());
+ });
++function CodexWebOpenThreadInTab(conversationId) {
++  const url = new URL(`/thread/${encodeURIComponent(conversationId)}`, window.location.origin);
++  window.open(url.href, `_blank`, `noopener,noreferrer`);
++}
+ function VAn({
+   scope: e,
+   target: t,
+@@ -156444,7 +156449,6 @@
+       sh(e, m, !S);
+     },
+     O = ST(e, `4157559322`),
+-    k = ST(e, `459748632`),
+     A = gQ({
+       pin: E ? qkn({ isPinned: S, onPinnedChange: D }) : void 0,
+       rename: T ? void 0 : { id: `rename-thread`, onSelect: r },
+@@ -156605,13 +156609,12 @@
+       !w(e.get, `remote_control_connections`)?.some((e) => e.hostId === h) &&
+       e.get(Nze, m) &&
+       P.push(...sCe({ scope: e, cwd: br(g), hostId: h })),
+-    k &&
++    h === `local` &&
+       P.push({
+         id: `open-in-new-window`,
+         icon: SQ.openInNewWindow,
+         message: Rx.openInNewWindow,
+-        onSelect: () =>
+-          X_.dispatchMessage(`open-in-new-window`, { path: Ms(m) }),
++        onSelect: () => CodexWebOpenThreadInTab(m),
+       }),
+     [
+       { id: `primary`, items: A },
+@@ -157595,7 +157598,7 @@
+         return rjn({
+           items: VAn({
+             scope: T,
+-            surface: `sidebar`,
++            surface: e === `row-actions` ? `header` : `sidebar`,
+             isUnread: a ?? !1,
+             target: { conversationId: n, hostId: M, cwd: ye, threadSummary: w },
+             actions: ee,
+@@ -157664,9 +157667,7 @@
+         let { archive: t, onMenuOpenChange: r } = e;
+         return (0, TQ.jsx)(Pjn, {
+           archive: t != null && (Ee || L) ? Me : t,
+-          getMenuItems: E
+-            ? async () => (await Je(), Xe(`row-actions`))
+-            : void 0,
++          getMenuItems: async () => (await Je(), Xe(`row-actions`)),
+           onMenuOpenChange: r,
+           pinAction: Ze
+             ? {

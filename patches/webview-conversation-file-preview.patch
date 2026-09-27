@@ -1,0 +1,39 @@
+--- a/webview/assets/local-conversation-thread-9a0a61c5e076.js
++++ b/webview/assets/local-conversation-thread-9a0a61c5e076.js
+@@ -4662,6 +4662,17 @@
+         { Icon: As, kind: `site`, label: eb.site },
+       ]));
+   });
++function codexWebPreviewConversationFile(filePath, cwd, hostId) {
++  if (hostId !== `local` || typeof filePath !== `string`) return !1;
++  const absolutePath = filePath.startsWith(`/`)
++    ? filePath
++    : cwd && cwd.startsWith(`/`)
++      ? `${cwd}/${filePath}`
++      : null;
++  if (absolutePath == null) return !1;
++  window.open(`/file-preview.html#${encodeURIComponent(absolutePath)}`, `_blank`, `noopener`);
++  return !0;
++}
+ function rb(e) {
+   let t = (0, ib.c)(52),
+     { forceShowArtifacts: n, isVisible: r, presentation: i } = e,
+@@ -4714,6 +4725,7 @@
+   t[13] !== m || t[14] !== T || t[15] !== s
+     ? ((j = (e) => {
+         let { icon: t, path: n, title: r } = e;
++        if (codexWebPreviewConversationFile(n, T, m.id)) return;
+         Ko({
+           scope: s,
+           path: n,
+@@ -13777,8 +13789,8 @@
+   t[14] !== h || t[15] !== g || t[16] !== i
+     ? ((N = (e) => {
+         let t = e.fsPath || e.path;
+-        t.length !== 0 &&
+-          Ko({
++        if (t.length === 0 || codexWebPreviewConversationFile(t, h, g.id)) return;
++        Ko({
+             scope: i,
+             path: t,
+             line: e.startLine,

@@ -1,0 +1,83 @@
+--- a/webview/assets/general-settings-f0dd56c74db0.js
++++ b/webview/assets/general-settings-f0dd56c74db0.js
+@@ -4023,12 +4023,79 @@
+   return (
+     e[5] === n
+       ? (a = e[6])
+-      : ((a = (0, $.jsxs)(me, { title: r, children: [n, i] })),
++      : ((a = (0, $.jsxs)(me, { title: r, children: [n, (0, $.jsx)(CodexWebTrustedIps, {}), i] })),
+         (e[5] = n),
+         (e[6] = a)),
+     a
+   );
+ }
++function CodexWebTrustedIps() {
++  const intl = F();
++  const tr = (id, defaultMessage) => intl.formatMessage({ id: `codexWeb.trustedIps.${id}`, defaultMessage });
++  const [ips, setIps] = Qo.useState([]);
++  const [original, setOriginal] = Qo.useState([]);
++  const [currentIp, setCurrentIp] = Qo.useState(null);
++  const [input, setInput] = Qo.useState(``);
++  const [busy, setBusy] = Qo.useState(false);
++  const [loading, setLoading] = Qo.useState(true);
++  const [message, setMessage] = Qo.useState(``);
++  const [error, setError] = Qo.useState(``);
++  Qo.useEffect(() => {
++    const controller = new AbortController();
++    fetch(`/__auth/trusted-ips`, { credentials: `same-origin`, cache: `no-store`, signal: controller.signal })
++      .then((response) => { if (!response.ok) throw Error(`load`); return response.json(); })
++      .then((data) => { setIps(data.ips); setOriginal(data.ips); setCurrentIp(data.currentIp); })
++      .catch((reason) => { if (reason.name !== `AbortError`) setError(tr(`loadError`, `Unable to load the IP allowlist.`)); })
++      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
++    return () => controller.abort();
++  }, []);
++  const changed = JSON.stringify([...ips].sort()) !== JSON.stringify([...original].sort());
++  const buttonStyle = { minHeight: 34, padding: `5px 12px`, border: `1px solid var(--border-default, #d8e1e5)`, borderRadius: 8, background: `var(--color-background-button-secondary, #fff)`, color: `inherit`, cursor: `pointer`, font: `inherit` };
++  const add = (event) => {
++    event.preventDefault();
++    const ip = input.trim();
++    const parts = ip.split(`.`);
++    const local = parts.length === 4 && parts.every((part) => /^\d{1,3}$/.test(part) && Number(part) <= 255 && String(Number(part)) === part) &&
++      (parts[0] === `10` || parts[0] === `127` || (parts[0] === `172` && Number(parts[1]) >= 16 && Number(parts[1]) <= 31) || (parts[0] === `192` && parts[1] === `168`));
++    if (!local) { setError(tr(`invalid`, `Enter a private or loopback IPv4 address.`)); return; }
++    if (ips.includes(ip)) { setError(tr(`duplicate`, `This IP address is already listed.`)); return; }
++    if (ips.length >= 128) { setError(tr(`limit`, `The allowlist can contain up to 128 addresses.`)); return; }
++    setIps([...ips, ip].sort()); setInput(``); setError(``); setMessage(``);
++  };
++  const save = async () => {
++    setBusy(true); setError(``); setMessage(``);
++    try {
++      const response = await fetch(`/__auth/trusted-ips`, { method: `PUT`, credentials: `same-origin`, headers: { 'Content-Type': `application/json` }, body: JSON.stringify({ ips }) });
++      if (!response.ok) throw Error(`save`);
++      const data = await response.json();
++      setIps(data.ips); setOriginal(data.ips); setCurrentIp(data.currentIp);
++      setMessage(tr(`saved`, `IP allowlist saved.`));
++    } catch { setError(tr(`saveError`, `Unable to save the IP allowlist.`)); }
++    finally { setBusy(false); }
++  };
++  return (0, $.jsxs)(H, { children: [
++    (0, $.jsx)(H.Header, { title: tr(`title`, `IP allowlist`) }),
++    (0, $.jsx)(H.Content, { children: (0, $.jsxs)(`div`, { style: { padding: `16px 0`, display: `grid`, gap: 14 }, children: [
++      (0, $.jsx)(`p`, { style: { margin: 0, color: `var(--color-text-secondary, #687986)`, lineHeight: 1.5 }, children: tr(`description`, `Listed private IP addresses can open this panel without a password. Changes take effect when saved.`) }),
++      currentIp && (0, $.jsxs)(`p`, { style: { margin: 0, fontSize: 13, color: `var(--color-text-secondary, #687986)` }, children: [tr(`current`, `Current connection:`), ` `, currentIp] }),
++      loading ? (0, $.jsx)(`p`, { children: tr(`loading`, `Loading…`) }) :
++        ips.length ? (0, $.jsx)(`ul`, { style: { listStyle: `none`, padding: 0, margin: 0, display: `grid`, gap: 8 }, children: ips.map((ip) =>
++          (0, $.jsxs)(`li`, { style: { display: `flex`, alignItems: `center`, justifyContent: `space-between`, gap: 12, minHeight: 42, padding: `4px 10px`, border: `1px solid var(--border-default, #d8e1e5)`, borderRadius: 8 }, children: [
++            (0, $.jsxs)(`span`, { children: [ip, ip === currentIp ? ` · ${tr(`thisDevice`, `This device`)}` : ``] }),
++            (0, $.jsx)(`button`, { type: `button`, disabled: busy, style: buttonStyle, 'aria-label': `${tr(`remove`, `Remove`)} ${ip}`, onClick: () => { setIps(ips.filter((item) => item !== ip)); setError(``); setMessage(``); }, children: tr(`remove`, `Remove`) })
++          ] }, ip)) }) : (0, $.jsx)(`p`, { style: { margin: 0 }, children: tr(`empty`, `No trusted IP addresses.`) }),
++      (0, $.jsxs)(`form`, { onSubmit: add, style: { display: `flex`, gap: 8, flexWrap: `wrap` }, children: [
++        (0, $.jsx)(`label`, { htmlFor: `codex-web-trusted-ip-input`, style: { flex: `1 0 100%`, fontWeight: 600 }, children: tr(`input`, `IP address`) }),
++        (0, $.jsx)(`input`, { id: `codex-web-trusted-ip-input`, type: `text`, inputMode: `decimal`, value: input, disabled: loading || busy, placeholder: `192.168.1.10`, 'aria-label': tr(`input`, `IP address`), onChange: (event) => setInput(event.target.value), style: { flex: `1 1 180px`, minHeight: 36, padding: `6px 10px`, border: `1px solid var(--border-default, #d8e1e5)`, borderRadius: 8, background: `var(--color-background-button-secondary, #fff)`, color: `inherit`, font: `inherit` } }),
++        (0, $.jsx)(`button`, { type: `submit`, disabled: loading || busy, style: buttonStyle, children: tr(`add`, `Add IP`) })
++      ] }),
++      !ips.includes(currentIp) && original.includes(currentIp) && (0, $.jsx)(`p`, { style: { margin: 0, color: `var(--color-text-warning, #976100)` }, children: tr(`currentRemoved`, `After saving, this device will need a password next time.`) }),
++      (0, $.jsx)(`button`, { type: `button`, disabled: loading || busy || !changed, onClick: save, style: { ...buttonStyle, justifySelf: `start`, background: changed ? `var(--color-background-button-primary, #385c7e)` : buttonStyle.background, color: changed ? `var(--color-text-button-primary, #fff)` : `inherit`, opacity: loading || busy || !changed ? .6 : 1 }, children: busy ? tr(`saving`, `Saving…`) : tr(`save`, `Save changes`) }),
++      error && (0, $.jsx)(`p`, { role: `alert`, style: { margin: 0, color: `var(--color-text-error, #ab3434)` }, children: error }),
++      message && (0, $.jsx)(`p`, { role: `status`, style: { margin: 0 }, children: message })
++    ] }) })
++  ] });
++}
+ function uo() {
+   let e = (0, Q.c)(51),
+     t = W(qt),

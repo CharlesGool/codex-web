@@ -40,6 +40,7 @@ patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-pet
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-hide-desktop-menu.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-file-context-actions.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-hide-default-file-target.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-trusted-ips-settings.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-website-preview.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-profile-logout-label.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-hide-terminal-source-hint.patch
@@ -58,9 +59,17 @@ patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-ter
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-browser-file-drop.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-linked-archive-download.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-image-preview-remove.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-conversation-file-preview.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-conversation-search-button.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/app-host-json-rpc.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/app-host-browser-windows.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/app-terminal-cwd-report.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-open-thread-browser-tab.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-mobile-viewport.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-disable-pets-shortcuts.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-help-about-search-style.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-computer-use-unavailable.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-automations-unavailable.patch
 python3 scripts/patch_webview_project_locale.py
 rm -rf scratch/asar/node_modules/better-sqlite3
 ./scripts/prepare_native_terminal

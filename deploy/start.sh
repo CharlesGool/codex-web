@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-export PATH="$project_dir/../node/bin:$PATH"
+project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+runtime_bin="${CODEX_WEB_NODE_BIN_DIR:-$project_dir/node/bin}"
+if [[ -x "$runtime_bin/node" ]]; then
+  export PATH="$runtime_bin:$PATH"
+fi
 export CODEX_CLI_PATH="${CODEX_CLI_PATH:-$(command -v codex)}"
 
 # The desktop bundle uses Git even for some panel and terminal state. A user

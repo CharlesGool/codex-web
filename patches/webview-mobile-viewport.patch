@@ -1,0 +1,43 @@
+--- a/webview/index.html
++++ b/webview/index.html
+@@ -6,6 +6,7 @@
+     <base href="/" />
+     <!-- PROD_CSP_TAG_HERE -->
+     <script src="./secure-context-polyfill.js"></script>
++    <script src="./viewport-size.js"></script>
+     <script defer src="./logout-button.js"></script>
+     <script defer src="./sidebar-files.js"></script>
+     <script type="module" src="./assets/preload.js"></script>
+@@ -144,6 +145,21 @@
+         --spacing-token-safe-header-left: 0px;
+       }
+     </style>
++    <style>
++      html,
++      body {
++        height: var(--codex-web-viewport-height, 100dvh) !important;
++        overflow: hidden;
++      }
++      #root {
++        position: fixed;
++        top: var(--codex-web-viewport-top, 0px);
++        left: 0;
++        width: 100%;
++        height: var(--codex-web-viewport-height, 100dvh) !important;
++        overflow: hidden;
++      }
++    </style>
+     <script
+       type="module"
+       crossorigin
+--- a/webview/assets/app-initial-236e1501144c.js
++++ b/webview/assets/app-initial-236e1501144c.js
+@@ -371705,7 +371705,7 @@
+       "--spacing-token-safe-header-left": `0px`,
+       "--spacing-token-safe-header-right": `${R.right / L}px`,
+       width: `calc(100vw / var(--codex-window-zoom))`,
+-      height: `calc(100vh / var(--codex-window-zoom))`,
++      height: `calc(var(--codex-web-viewport-height, 100dvh) / var(--codex-window-zoom))`,
+       zoom: `var(--codex-window-zoom)`,
+     },
+     ze = (0, G$.useMemo)(

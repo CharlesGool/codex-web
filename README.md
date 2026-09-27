@@ -1,193 +1,73 @@
-# codex-web
+---
+name: project-readme
+description: Codex Web fork overview and usage
+metadata:
+  version: "1.0.0"
+  lang: "en"
+---
 
-a browser frontend for codex desktop, running on a machine you control.
+# Codex Web
 
-https://github.com/user-attachments/assets/0a33cbd8-741c-412c-9e75-46dfe9324596
+## Multi-language
 
-## motivation
+**English** | [简体中文](doc/zh-CN/README.md) | [繁體中文 (台灣)](doc/zh-TW/README.md) | [繁體中文 (香港)](doc/zh-HK/README.md) | [हिन्दी](doc/hi/README.md) | [Español](doc/es/README.md) | [العربية](doc/ar/README.md) | [Français](doc/fr/README.md)
 
-the agents were never meant to stay trapped in a terminal window for long.
-codex desktop brought the power of agents to your local computer, where your
-files, credentials, and tools already live.
+## Documentation
 
-codex-web brings codex desktop to the browser while keeping the backend on a
-machine you control (a linux box in the cloud, your home lab, or a desktop / mac
-mini). agents keep running after your laptop closes. you can reconnect from any
-device with a browser.
+- Project overview: [README](README.md)
 
-this project aims to be as thin a wrapper as possible to ensure upstream changes
-to the codex desktop app can be integrated quickly.
+- Design rationale: [DESIGN](doc/DESIGN.md)
 
-## usage
+- Release history: [LOG](doc/LOG.md)
 
-`codex-web` serves the browser client and hosts the desktop-side bridge. by
-default, it listens on `127.0.0.1:8214`.
+- Third-party notices: [THIRD_PARTY_NOTICES](doc/THIRD_PARTY_NOTICES.md)
 
-it will use `codex` from `PATH` if available, or `CODEX_CLI_PATH` if you set
-it.
+## Introduction
 
-Git must also be available to the server process. When using `start.sh`, it
-checks `PATH` and falls back to the Codex runtime's bundled Git when present.
-Set `CODEX_WEB_GIT_BIN_DIR` to another Git bin directory if needed. Without
-Git, opening the side or bottom panel can briefly flash and then close.
+This fork runs the Codex desktop interface in a browser while keeping the Codex CLI and file access on a machine you control. It adds browser authentication, local file actions, a static website preview, and fixes for desktop-only controls. The desktop application is extracted and modified with versioned patches during the build.
 
-The build prepares Brotli and gzip variants of larger JavaScript and CSS files.
-Authenticated versioned assets use a private five-minute browser cache; HTML,
-API responses, and local file routes are not cached. After changing a bundled
-asset without changing its filename, use a hard refresh to see it immediately.
+## Requirements
 
-In this fork, the file preview's **Download** action saves local host files
-through the authenticated web server. Its menu can also open the file or its
-folder in a separate File Browser instance on port `8002` of the same host.
-File Browser has its own login. These actions currently target files on the
-Codex Web host, not files on a remote execution host.
+- Minimum: Node.js and npm compatible with `package.json`, Git, a signed-in Codex CLI, and a supported Codex desktop bundle for extraction. The build needs network access to fetch that bundle. A browser must be able to reach the chosen host and port.
+- Recommended: Run behind HTTPS or an encrypted tunnel. Use a dedicated host account and keep the service on a trusted network. The bundled UI and authenticated API can operate with that account's file and command permissions.
 
-run it with `npx`:
+## Install
 
-```bash
-npx --yes github:0xcaff/codex-web
-```
+### Quick install
 
-or with nix:
+From a checkout with a prepared desktop bundle and installed dependencies, run `npm run prepare && ./deploy/start.sh`. The server listens on `127.0.0.1:8214` by default.
 
-```bash
-nix run github:0xcaff/codex-web
-```
+### Normal install
 
-then open <http://127.0.0.1:8214> in a browser.
+1. Install Node.js, npm, Git, and Codex CLI; sign in with `codex login --device-auth`.
+2. Run `npm ci`, then `npm run prepare`. The build extracts the desktop bundle, applies `patches/*.patch`, builds the browser and server, and creates compressed web assets.
+3. For a network deployment, create credentials with `node scripts/set-auth-password.mjs USERNAME`; record the generated password securely.
+4. Run `./deploy/start.sh --host HOST --port PORT`, then open the matching URL. See [Design](doc/DESIGN.md) for the deployment layout and boundaries.
 
-### sign in
+## Guidance
 
-ensure the codex cli on the host machine is signed in before starting the
-server.
+- The browser UI uses the signed-in Codex CLI on the host. Local files can be downloaded or opened in a separate File Browser service if one is configured.
+- A website resource opens a view-only static preview. It does not start that website's backend.
+- An image awaiting send can be removed from either its thumbnail or the full-screen preview. Removing it stops it from being included in the draft.
+- `CODEX_CLI_PATH` selects the CLI. `CODEX_WEB_NODE_BIN_DIR` and `CODEX_WEB_GIT_BIN_DIR` select runtime tool directories when they are outside `PATH`. `CODEX_WEB_AUTH_FILE` and `CODEX_WEB_TRUSTED_IPS_FILE` select authentication files. See the [previous upstream-oriented README](third_party/codex-web/README.previous.md) for credential rotation and trusted-IP commands.
+- A hard refresh may be needed after replacing a web asset without changing its filename because versioned assets can be cached briefly.
 
-```bash
-codex login --device-auth
-```
+## Upgrade
 
-### proxying to app-server (advanced usage)
+1. Back up `~/.config/codex-web/auth.json` and `~/.config/codex-web/trusted-ips.json`, and record the running version and deployment path.
+2. Pull the desired revision in a separate checkout and run `npm ci && npm run prepare`. Review any failed patch against the desktop bundle version before deploying.
+3. Copy the prepared files into the deployment directory. Replacing static assets alone does not require a server restart; server changes do. An operator-initiated restart interrupts active conversations and tasks, so obtain explicit user confirmation for that specific restart after preparation and checks.
+4. Open the login page and verify sign-in, the browser UI, and the changed feature. Retain the previous deployment until these checks pass. See [Upgrading](UPGRADING.md) for the inherited update workflow.
 
-it’s often useful to run the app server separately, so a crash or restart of
-codex-web doesn’t interrupt the codex process executing commands.
+## Uninstall
 
-it's possible to hook codex-web up to an already-running app server using the
-`codex_remote_proxy` script.
+- Quick: stop the service and remove the application checkout or deployment directory. Keep the config files if you expect to reinstall.
+- Complete: also remove the systemd user service, `~/.config/codex-web/auth.json`, `~/.config/codex-web/trusted-ips.json`, and any separately stored runtime or File Browser data you own. Review those paths before deletion if shared by another deployment.
 
-start a long-lived app server somewhere:
+## Acknowledgements
 
-```bash
-mkdir -p /tmp/codex-app-server
-cd /tmp/codex-app-server
-codex app-server --listen unix://codex-app-server.sock
-```
+This is a fork of [0xcaff/codex-web](https://github.com/0xcaff/codex-web) and adapts the Codex desktop client. Dependency and desktop bundle attribution status is recorded in [Third-party notices](doc/THIRD_PARTY_NOTICES.md).
 
-then run `codex-web` with the proxy helper:
+## License
 
-```bash
-nix shell github:0xcaff/codex-web github:0xcaff/codex-web#codex_remote_proxy -c bash -lc '
-  export CODEX_UNIX_SOCKET=/tmp/codex-app-server/codex-app-server.sock
-  export CODEX_CLI_PATH="$(command -v codex_remote_proxy)"
-  codex-web
-'
-```
-
-`codex app-server proxy --sock ...` is a raw stdio protocol bridge for another
-program to use; when run directly in a terminal it will wait for protocol input
-rather than opening an interactive prompt.
-
-## security
-
-run `codex-web` only on trusted networks. treat anyone who can reach the
-`codex-web` server as someone who can operate codex on the host machine as the
-same user running the server.
-
-if you need authn or authz, implement it outside of `codex-web`: proxy it through
-wireguard, tailscale, or an ssh tunnel and put an authentication gateway or
-reverse proxy in front.
-
-someone with access to the web ui may be able to:
-
-- run commands on the host, limited only by the permissions of the `codex-web`
-  server process.
-- read or modify files, environment variables, credentials, ssh keys, and other
-  local resources that are accessible to that process.
-- use the codex / chatgpt account already signed in on the host. this may
-  consume usage quota or billing credits, and may expose account metadata shown
-  by the app or cli, such as name or email address.
-
-## features
-
-- hostable on macOS, Linux (and anything codex cli + node will run on)
-- reachable from the browser
-- thin wrapper, so updates should land fast
-- working today:
-  - subagents
-  - inline images
-  - editor sidepanel
-  - transcription
-  - integrated terminal on Linux hosts after preparing the bundled app
-
-## roadmap
-
-some parts of the desktop experience are not wired up yet:
-
-- browser panel support, likely rebuilt around iframes
-- computer use on linux, which could become a very powerful feature
-- git worker integration
-- whatever else people find and file issues for
-
-## issues welcome
-
-if something is broken, missing, or rough around the edges, please file an
-issue.
-
-using `codex-web` in an interesting way? post about it on x and tag me
-[@0xcaff](https://x.com/0xcaff).
-
-using this at a company and need something more tailored? email me and we can
-talk.
-
-## alternatives
-
-* [davej/pocodex](https://github.com/davej/pocodex) i used this until the wheels fell off. i needed subagents
-  and an inline image viewer. this didn't have them and was having a hard time
-  keeping up with upstream codex updates.
-* the native codex remote feature (behind a feature flag) is great for
-  connecting to remote codex hosts over ssh to manage long running tasks but
-  this only works if you have codex desktop on your client device. this means it
-  doesn't work on mobile.
-* upcoming first party mobile app from openai. `codex-web` exists and works
-  today. i can't wait for the mobile app but judging by the other openai mobile
-  apps, i'm a little bit skeptical about the quality of the mobile experience.
-  time will tell.
-# Access protection for a network deployment
-
-Before starting the server, create a local login credential with
-`node scripts/set-auth-password.mjs USERNAME`. The command prints a newly
-generated password once and stores only its scrypt hash in
-`~/.config/codex-web/auth.json` (mode 0600). Set `CODEX_WEB_AUTH_FILE` to use a
-different location. Run the command again and restart the service to rotate the
-password; a restart also invalidates all sessions.
-
-Every HTTP route, including static assets, uploads, and `/@fs/`, requires a
-session. The WebSocket bridge checks the session and same-origin `Origin`
-header before upgrading. Sessions expire after 12 hours. Use HTTPS or a trusted
-encrypted tunnel when accessing the service outside a trusted local network:
-HTTP alone does not protect the password or session cookie in transit.
-
-To let specific LAN devices connect without signing in, add their actual client
-IPv4 addresses to `~/.config/codex-web/trusted-ips.json`:
-
-```bash
-node scripts/manage-trusted-ips.mjs add 172.22.31.94 172.22.31.92
-node scripts/manage-trusted-ips.mjs list
-node scripts/manage-trusted-ips.mjs remove 172.22.31.94
-```
-
-The list accepts exact private or loopback IPv4 addresses, reloads within about
-one second, and applies to both HTTP and WebSocket connections. All other
-clients still need the username and password. `CODEX_WEB_TRUSTED_IPS_FILE` sets
-a different file location. The server uses the TCP peer address and ignores
-`X-Forwarded-For`; do not add a shared reverse proxy's address because that
-would exempt all clients connecting through it. On an exempt device, logging
-out clears the cookie but the device still has access through its trusted IP.
+`package.json` declares `MIT` (SPDX). This checkout does not contain a complete upstream license text; redistribution rights for the extracted desktop application must be reviewed separately. See [Third-party notices](doc/THIRD_PARTY_NOTICES.md).

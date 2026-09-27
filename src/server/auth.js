@@ -97,7 +97,7 @@ const loginPage = `<!doctype html>
     ipButton.addEventListener('click',async()=>{
       setBusy(true);ipButton.textContent='检查中…';error.textContent='';
       try{
-        const response=await fetch('/__auth/ip-access',{credentials:'same-origin',cache:'no-store'});
+        const response=await fetch('/__auth/ip-access',{method:'POST',credentials:'same-origin',cache:'no-store'});
         if(response.ok){location.replace('/');return}
         error.textContent='此设备未加入可信 IP 列表，请使用账号和密码登录。';
       }catch{error.textContent='无法连接服务器'}finally{setBusy(false);ipButton.textContent='使用可信 IP 访问'}
@@ -124,7 +124,6 @@ async function installAuthentication(app) {
     const expectedHash = Buffer.from(credential.hash, "hex");
     const sessions = new Map();
     const failures = new Map();
-    const trustedSockets = new Map();
     let trustedIps = (0, trusted_ips_js_1.readTrustedIps)();
     function trustedPeer(address) {
         const ip = (0, trusted_ips_js_1.normalizePeerIp)(address);
@@ -139,12 +138,12 @@ async function installAuthentication(app) {
             trustedIps = new Set();
             console.error("Codex Web trusted IP list rejected:", error);
         }
-        for (const [ip, sockets] of trustedSockets) {
-            if (trustedIps.has(ip))
+        for (const [id, session] of sessions) {
+            if (!session.trustedIp || trustedIps.has(session.trustedIp))
                 continue;
-            for (const socket of sockets)
+            for (const socket of session.sockets)
                 socket.close(1008, "IP no longer trusted");
-            trustedSockets.delete(ip);
+            sessions.delete(id);
         }
     };
     (0, node_fs_1.watchFile)(trusted_ips_js_1.trustedIpsPath, { interval: 1000, persistent: false }, reloadTrustedIps);
@@ -156,6 +155,12 @@ async function installAuthentication(app) {
         const session = sessions.get(id);
         if (!session)
             return null;
+        if (session.trustedIp && !trustedIps.has(session.trustedIp)) {
+            for (const socket of session.sockets)
+                socket.close(1008, "IP no longer trusted");
+            sessions.delete(id);
+            return null;
+        }
         if (session.expiresAt <= Date.now()) {
             for (const socket of session.sockets)
                 socket.close(1008, "Session expired");
@@ -164,13 +169,28 @@ async function installAuthentication(app) {
         }
         return id;
     }
+    function issueSession(request, reply, trustedIp) {
+        const id = (0, node_crypto_1.randomBytes)(32).toString("hex");
+        sessions.set(id, { expiresAt: Date.now() + sessionLifetimeMs, sockets: new Set(), trustedIp });
+        setTimeout(() => {
+            const session = sessions.get(id);
+            if (!session)
+                return;
+            for (const socket of session.sockets)
+                socket.close(1008, "Session expired");
+            sessions.delete(id);
+        }, sessionLifetimeMs).unref();
+        const secure = request.raw.socket.encrypted ? "; Secure" : "";
+        reply.header("Set-Cookie", `${cookieName}=${id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${sessionLifetimeMs / 1000}${secure}`);
+    }
     app.addHook("onRequest", async (request, reply) => {
         reply.header("X-Content-Type-Options", "nosniff");
         reply.header("Referrer-Policy", "no-referrer");
         reply.header("Cache-Control", "no-store");
-        if (request.url === "/login" || request.url === "/__auth/login" || request.url === "/__auth/ip-access")
+        if (((request.method === "GET" || request.method === "HEAD") && request.url === "/login") ||
+            (request.method === "POST" && (request.url === "/__auth/login" || request.url === "/__auth/ip-access")))
             return;
-        if (validSession(request.headers.cookie) || trustedPeer(request.raw.socket.remoteAddress)) {
+        if (validSession(request.headers.cookie)) {
             if ((request.method === "GET" || request.method === "HEAD") && versionedWebAsset.test(request.url)) {
                 // Patched bundles keep their upstream filenames, so use a short lifetime.
                 reply.header("Cache-Control", "private, max-age=300");
@@ -183,15 +203,48 @@ async function installAuthentication(app) {
         }
         return reply.code(401).send({ error: "Authentication required" });
     });
-    app.get("/login", async (request, reply) => {
-        if (validSession(request.headers.cookie) || trustedPeer(request.raw.socket.remoteAddress))
-            return reply.redirect("/");
+    app.get("/login", async (_request, reply) => {
         reply.header("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; form-action 'self'; base-uri 'none'");
         return reply.type("text/html; charset=utf-8").send(loginPage);
     });
-    app.get("/__auth/ip-access", async (request, reply) => {
-        if (!trustedPeer(request.raw.socket.remoteAddress))
+    app.get("/__auth/trusted-ips", async (request) => ({
+        ips: [...trustedIps].sort(),
+        currentIp: (0, trusted_ips_js_1.normalizePeerIp)(request.raw.socket.remoteAddress),
+    }));
+    app.put("/__auth/trusted-ips", { bodyLimit: 8192 }, async (request, reply) => {
+        if (!sameOrigin(request.raw))
+            return reply.code(403).send({ error: "Invalid origin" });
+        const body = request.body;
+        const ips = body?.ips;
+        if (request.headers["content-type"]?.split(";")[0] !== "application/json" ||
+            !Array.isArray(ips) || ips.length > 128 ||
+            !ips.every((ip) => typeof ip === "string" && (0, trusted_ips_js_1.isLocalIpv4)(ip)) ||
+            new Set(ips).size !== ips.length) {
+            return reply.code(400).send({ error: "Use up to 128 unique private or loopback IPv4 addresses" });
+        }
+        await promises_1.default.mkdir(node_path_1.default.dirname(trusted_ips_js_1.trustedIpsPath), { recursive: true, mode: 0o700 });
+        const temporaryPath = `${trusted_ips_js_1.trustedIpsPath}.${(0, node_crypto_1.randomBytes)(8).toString("hex")}.tmp`;
+        try {
+            await promises_1.default.writeFile(temporaryPath, `${JSON.stringify({ ips: [...ips].sort() }, null, 2)}\n`, { mode: 0o600, flag: "wx" });
+            await promises_1.default.rename(temporaryPath, trusted_ips_js_1.trustedIpsPath);
+            await promises_1.default.chmod(trusted_ips_js_1.trustedIpsPath, 0o600);
+        }
+        finally {
+            await promises_1.default.unlink(temporaryPath).catch((error) => {
+                if (error.code !== "ENOENT")
+                    throw error;
+            });
+        }
+        reloadTrustedIps();
+        return reply.send({ ips: [...trustedIps].sort(), currentIp: (0, trusted_ips_js_1.normalizePeerIp)(request.raw.socket.remoteAddress) });
+    });
+    app.post("/__auth/ip-access", async (request, reply) => {
+        if (!sameOrigin(request.raw))
             return reply.code(403).send({ ok: false });
+        const ip = trustedPeer(request.raw.socket.remoteAddress);
+        if (!ip)
+            return reply.code(403).send({ ok: false });
+        issueSession(request, reply, ip);
         return reply.send({ ok: true });
     });
     app.post("/__auth/login", { bodyLimit: 4096 }, async (request, reply) => {
@@ -213,18 +266,7 @@ async function installAuthentication(app) {
             return reply.code(401).send({ error: "Invalid credentials" });
         }
         failures.delete(key);
-        const id = (0, node_crypto_1.randomBytes)(32).toString("hex");
-        sessions.set(id, { expiresAt: now + sessionLifetimeMs, sockets: new Set() });
-        setTimeout(() => {
-            const session = sessions.get(id);
-            if (!session)
-                return;
-            for (const socket of session.sockets)
-                socket.close(1008, "Session expired");
-            sessions.delete(id);
-        }, sessionLifetimeMs).unref();
-        const secure = request.raw.socket.encrypted ? "; Secure" : "";
-        reply.header("Set-Cookie", `${cookieName}=${id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${sessionLifetimeMs / 1000}${secure}`);
+        issueSession(request, reply);
         return reply.send({ ok: true });
     });
     app.post("/__auth/logout", async (request, reply) => {
@@ -242,28 +284,9 @@ async function installAuthentication(app) {
             if (!sameOrigin(request))
                 return null;
             const id = validSession(request.headers.cookie);
-            if (id)
-                return { kind: "session", id };
-            const ip = trustedPeer(request.socket.remoteAddress);
-            return ip ? { kind: "trusted-ip", ip } : null;
+            return id ? { kind: "session", id } : null;
         },
         registerSocket(authorization, socket) {
-            if (authorization.kind === "trusted-ip") {
-                const { ip } = authorization;
-                if (!trustedIps.has(ip)) {
-                    socket.close(1008, "IP no longer trusted");
-                    return;
-                }
-                const sockets = trustedSockets.get(ip) ?? new Set();
-                sockets.add(socket);
-                trustedSockets.set(ip, sockets);
-                socket.on("close", () => {
-                    sockets.delete(socket);
-                    if (sockets.size === 0)
-                        trustedSockets.delete(ip);
-                });
-                return;
-            }
             const { id } = authorization;
             sessions.get(id)?.sockets.add(socket);
             socket.on("close", () => sessions.get(id)?.sockets.delete(socket));

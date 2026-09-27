@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>文件预览 · Codex Web</title>
+  <style>
+    :root{color-scheme:light dark;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}body{margin:0;background:#f7f8fa;color:#233246}
+    header{display:flex;align-items:center;gap:16px;padding:16px 24px;background:#fff;border-bottom:1px solid #dfe5ea}
+    h1{font-size:17px;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+    a{color:#385c7e;text-decoration:none;border:1px solid #cdd8e1;border-radius:8px;padding:8px 14px;background:#fff}
+    main{max-width:1200px;margin:24px auto;padding:0 24px}
+    pre{font:14px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;border:1px solid #dfe5ea;border-radius:12px;padding:24px;margin:0}
+    img{display:block;max-width:100%;max-height:calc(100vh - 150px);margin:auto}
+    iframe{border:1px solid #dfe5ea;border-radius:12px;width:100%;height:calc(100vh - 140px);background:#fff}
+    .message{color:#64748b}
+    @media(prefers-color-scheme:dark){body{background:#141a20;color:#e7edf3}header,pre,a{background:#202933;color:#e7edf3;border-color:#3a4652}.message{color:#a6b4c1}}
+  </style>
+</head>
+<body>
+  <header><h1 id="name">文件预览</h1><a id="download" href="#">下载</a></header>
+  <main id="content"><p class="message">正在读取文件…</p></main>
+  <script>
+    (async () => {
+      const content = document.getElementById("content");
+      const filePath = decodeURIComponent(location.hash.slice(1));
+      if (!filePath.startsWith("/")) {
+        content.textContent = "文件路径无效";
+        return;
+      }
+      const name = filePath.split("/").pop() || filePath;
+      document.title = name + " · Codex Web";
+      document.getElementById("name").textContent = name;
+      const url = "/__backend/download?hostId=local&path=" + encodeURIComponent(filePath);
+      document.getElementById("download").href = url;
+      const ext = name.split(".").pop().toLowerCase();
+      const imageTypes = {png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",webp:"image/webp",svg:"image/svg+xml",bmp:"image/bmp"};
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(response.status === 404 ? "文件不存在" : "读取失败（HTTP " + response.status + "）");
+        const size = Number(response.headers.get("content-length") || 0);
+        if (size > 20 * 1024 * 1024 && !imageTypes[ext] && ext !== "pdf") {
+          content.textContent = "文件较大，请使用下载按钮查看。";
+          return;
+        }
+        const blob = await response.blob();
+        content.replaceChildren();
+        if (imageTypes[ext] || ext === "pdf") {
+          const objectUrl = URL.createObjectURL(new Blob([blob], {type:imageTypes[ext] || "application/pdf"}));
+          const viewer = document.createElement(imageTypes[ext] ? "img" : "iframe");
+          viewer.src = objectUrl;
+          viewer.alt = name;
+          content.append(viewer);
+          addEventListener("pagehide", () => URL.revokeObjectURL(objectUrl), {once:true});
+        } else if (blob.size <= 20 * 1024 * 1024 && !blob.type.includes("image")) {
+          const bytes = new Uint8Array(await blob.slice(0, 4096).arrayBuffer());
+          if (bytes.includes(0)) {
+            content.textContent = "此文件无法以文本预览，请使用下载按钮查看。";
+            return;
+          }
+          const pre = document.createElement("pre");
+          pre.textContent = await blob.text();
+          content.append(pre);
+        }
+      } catch (error) {
+        content.textContent = error.message || "无法读取文件";
+      }
+    })();
+  </script>
+</body>
+</html>

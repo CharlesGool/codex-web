@@ -1,0 +1,303 @@
+--- a/webview/assets/app-initial-236e1501144c.js
++++ b/webview/assets/app-initial-236e1501144c.js
+@@ -279370,13 +279370,11 @@
+         [`archiveThread`, Qbi],
+         [`renameThread`, $bi],
+         [`toggleThreadPin`, exi],
+-        [`openAvatarOverlay`, txi],
+         [`hotkeyWindow`, nxi],
+         [`settings`, rxi],
+         [`codexMicroSettings`, ixi],
+         [`mcpSettings`, axi],
+         [`personalitySettings`, oxi],
+-        [`keyboardShortcuts`, sxi],
+         [`manageTasks`, cxi],
+         [`openSkills`, lxi],
+         [`openFolder`, uxi],
+@@ -310117,24 +310115,6 @@
+         shortcutScope: `app`,
+       },
+       {
+-        id: `openAvatarOverlay`,
+-        titleIntlId: `codex.command.openPetOverlay`,
+-        descriptionIntlId: `codex.commandDescription.openPetOverlay`,
+-        availableIn: [`electron`],
+-        shortcutScope: `os-global`,
+-        commandMenuGroupKey: `app`,
+-        commandMenu: !0,
+-        commandMenuFeature: `codex`,
+-        electron: {
+-          menuTitle: `Show pet`,
+-          menuTitleIntlId: `codex.commandMenuTitle.openAvatarOverlay`,
+-          platformDefaultKeybindings: {
+-            macOS: [{ key: `Ctrl+Space` }],
+-            default: [{ key: `Super+Alt+P` }],
+-          },
+-        },
+-      },
+-      {
+         id: `searchChats`,
+         titleIntlId: `codex.command.searchChats`,
+         descriptionIntlId: `codex.commandDescription.searchChats`,
+@@ -310453,26 +310433,6 @@
+         commandMenuGroupKey: `configure`,
+         commandMenu: !0,
+         commandMenuFeature: `codex`,
+-      },
+-      {
+-        id: `keyboardShortcuts`,
+-        titleIntlId: `codex.command.keyboardShortcuts`,
+-        descriptionIntlId: `codex.commandDescription.keyboardShortcuts`,
+-        commandMenuGroupKey: `configure`,
+-        commandMenu: !0,
+-      },
+-      {
+-        id: `showKeyboardShortcuts`,
+-        titleIntlId: `codex.command.showKeyboardShortcuts`,
+-        descriptionIntlId: `codex.commandDescription.showKeyboardShortcuts`,
+-        availableIn: [`browser`, `electron`],
+-        shortcutScope: `app`,
+-        browser: { defaultKeybindings: [{ key: `CmdOrCtrl+/` }] },
+-        electron: {
+-          menuTitle: `Keyboard Shortcuts`,
+-          menuTitleIntlId: `codex.commandMenuTitle.showKeyboardShortcuts`,
+-          defaultKeybindings: [{ key: `CmdOrCtrl+/` }],
+-        },
+       },
+       {
+         id: `clearAllUnreads`,
+@@ -311070,6 +311030,7 @@
+         : i.defaultKeybindings.map((e) => e.key);
+ }
+ function D4i({ commandId: e, windowType: t, keymapState: n, isMacOS: r }) {
++  if (window.location.protocol === `http:` || window.location.protocol === `https:`) return [];
+   if (t !== `electron`) {
+     let r = d4i(e);
+     if (r?.kind !== `webview` || !v4i(r, t) || !y4i(r)) return [];
+@@ -407051,12 +407012,12 @@
+             (
+               await W(
+                 async () => {
+-                  let { KeyboardShortcutsSettings: e } = await import(
+-                    `./keyboard-shortcuts-settings-13b9a764670f.js`
++                  let { PetsSettingsRoute: e } = await import(
++                    `./pets-settings-route-66d8bd66f50e.js`
+                   );
+                   return { KeyboardShortcutsSettings: e };
+                 },
+-                __vite__mapDeps([737, 1, 426, 427, 456, 738, 739]),
++                __vite__mapDeps([750, 1, 426, 427, 751, 752, 724, 753, 599, 754, 716, 699, 728, 755]),
+                 import.meta.url,
+               )
+             ).KeyboardShortcutsSettings,
+@@ -426894,6 +426855,8 @@
+   ) {
+     let t = OWo.filter(
+       (e) =>
++        window.location.protocol !== `http:` &&
++        window.location.protocol !== `https:` &&
+         v4i(e, `electron`) &&
+         !S4i(e) &&
+         m4i(e, { codexLocal: a, workLocal: o }) &&
+@@ -458973,28 +458936,7 @@
+     ((zss = u()), (Bss = n(c(), 1)), te(), gJa());
+   });
+ function Hss() {
+-  let e = (0, Wss.c)(3),
+-    [t, n] = (0, Gss.useState)(!1),
+-    r;
+-  (e[0] === Symbol.for(`react.memo_cache_sentinel`)
+-    ? ((r = () => {
+-        n(Uss);
+-      }),
+-      (e[0] = r))
+-    : (r = e[0]),
+-    oU(`showKeyboardShortcuts`, r));
+-  let i;
+-  return (
+-    e[1] === t
+-      ? (i = e[2])
+-      : ((i = t ? (0, Kss.jsx)(qss, { onOpenChange: n }) : null),
+-        (e[1] = t),
+-        (e[2] = i)),
+-    i
+-  );
+-}
+-function Uss(e) {
+-  return !e;
++  return null;
+ }
+ var Wss,
+   Gss,
+--- a/webview/assets/app-primary-6b28e06666ff.js
++++ b/webview/assets/app-primary-6b28e06666ff.js
+@@ -128634,18 +128634,7 @@
+     : ((S = y ? (0, lY.jsx)(Cp.Separator, {}) : null),
+       (t[10] = y),
+       (t[11] = S));
+-  let C;
+-  t[12] !== s || t[13] !== p || t[14] !== h
+-    ? ((C = (0, lY.jsx)(Vmn, {
+-        isPetVisible: s,
+-        onTogglePet: p,
+-        petShortcut: h,
+-      })),
+-      (t[12] = s),
+-      (t[13] = p),
+-      (t[14] = h),
+-      (t[15] = C))
+-    : (C = t[15]);
++  let C = null;
+   let w;
+   t[16] === Symbol.for(`react.memo_cache_sentinel`)
+     ? ((w = !1), (t[16] = w))
+@@ -128721,66 +128710,6 @@
+         (t[34] = k))
+       : (k = t[34]),
+     k
+-  );
+-}
+-function Vmn(e) {
+-  let t = (0, Hmn.c)(8),
+-    { isPetVisible: n, onTogglePet: r, petShortcut: i } = e,
+-    a = Jv(`1532120159`);
+-  if (r == null) return null;
+-  let o;
+-  if (a) {
+-    let e;
+-    (t[0] === n
+-      ? (e = t[1])
+-      : ((e = n
+-          ? (0, lY.jsx)(Y, {
+-              id: `codex.profileFooter.hideMini`,
+-              defaultMessage: `Hide Mini`,
+-              description: `Profile menu item that hides the floating Mini overlay`,
+-            })
+-          : (0, lY.jsx)(Y, {
+-              id: `codex.profileFooter.showMini`,
+-              defaultMessage: `Show Mini`,
+-              description: `Profile menu item that shows the floating Mini overlay`,
+-            })),
+-        (t[0] = n),
+-        (t[1] = e)),
+-      (o = e));
+-  } else {
+-    let e;
+-    (t[2] === n
+-      ? (e = t[3])
+-      : ((e = n
+-          ? (0, lY.jsx)(Y, {
+-              id: `codex.profileFooter.hidePet`,
+-              defaultMessage: `Hide pet`,
+-              description: `Profile menu item that hides the desktop pet`,
+-            })
+-          : (0, lY.jsx)(Y, {
+-              id: `codex.profileFooter.showPet`,
+-              defaultMessage: `Show pet`,
+-              description: `Profile menu item that shows the desktop pet`,
+-            })),
+-        (t[2] = n),
+-        (t[3] = e)),
+-      (o = e));
+-  }
+-  let s;
+-  return (
+-    t[4] !== r || t[5] !== o || t[6] !== i
+-      ? ((s = (0, lY.jsx)(U_, {
+-          LeftIcon: Rmn,
+-          keyboardShortcut: i,
+-          onClick: r,
+-          children: o,
+-        })),
+-        (t[4] = r),
+-        (t[5] = o),
+-        (t[6] = i),
+-        (t[7] = s))
+-      : (s = t[7]),
+-    s
+   );
+ }
+ var Hmn,
+@@ -317107,19 +317036,7 @@
+       (t[16] = s),
+       (t[17] = y))
+     : (y = t[17]);
+-  let b;
+-  t[18] === Symbol.for(`react.memo_cache_sentinel`)
+-    ? ((b = (0, w4.jsx)(Cp.Item, {
+-        LeftIcon: Jrr,
+-        onSelect: lir,
+-        children: (0, w4.jsx)(Y, {
+-          id: `sidebarHelp.keyboardShortcuts`,
+-          defaultMessage: `Keyboard shortcuts`,
+-          description: `Menu item that opens the active keyboard shortcuts dialog`,
+-        }),
+-      })),
+-      (t[18] = b))
+-    : (b = t[18]);
++  let b = null;
+   let x;
+   t[19] === Symbol.for(`react.memo_cache_sentinel`)
+     ? ((x = (0, w4.jsx)(Y, {
+@@ -317184,9 +317101,6 @@
+       : (w = t[32]),
+     w
+   );
+-}
+-function lir() {
+-  BC(`showKeyboardShortcuts`, `sidebar_help_menu`);
+ }
+ var uir,
+   w4,
+@@ -385908,50 +385822,7 @@
+       (sHr = Yp(Em, (e) => null)));
+   });
+ function lHr() {
+-  let e = (0, dHr.c)(7),
+-    t = Vl(),
+-    n;
+-  e[0] === t
+-    ? (n = e[1])
+-    : ((n = t.formatMessage({
+-        id: `composer.petOverlaySlashCommand.title`,
+-        defaultMessage: `Pet`,
+-        description: `Name of the Pet feature; use approved localized terminology`,
+-      })),
+-      (e[0] = t),
+-      (e[1] = n));
+-  let r;
+-  e[2] === t
+-    ? (r = e[3])
+-    : ((r = t.formatMessage({
+-        id: `composer.petOverlaySlashCommand.description`,
+-        defaultMessage: `Wake or tuck away the desktop pet`,
+-        description: `Description for the pet overlay slash command`,
+-      })),
+-      (e[2] = t),
+-      (e[3] = r));
+-  let i;
+-  return (
+-    e[4] !== n || e[5] !== r
+-      ? ((i = {
+-          id: `pet`,
+-          title: n,
+-          description: r,
+-          requiresEmptyComposer: !1,
+-          Icon: OE,
+-          enabled: !0,
+-          onSelect: uHr,
+-        }),
+-        (e[4] = n),
+-        (e[5] = r),
+-        (e[6] = i))
+-      : (i = e[6]),
+-    XD(i),
+-    null
+-  );
+-}
+-async function uHr() {
+-  BC(`openAvatarOverlay`, `avatar_overlay_slash_command`);
++  return null;
+ }
+ var dHr,
+   fHr = t(() => {
