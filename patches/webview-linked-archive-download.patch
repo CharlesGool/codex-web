@@ -1,0 +1,35 @@
+--- a/webview/assets/app-primary-6b28e06666ff.js
++++ b/webview/assets/app-primary-6b28e06666ff.js
+@@ -59488,6 +59488,15 @@
+     p
+   );
+ }
++function codexWebDownloadLinkedArchive(cwd, filePath) {
++  const path = filePath.startsWith(`/`) ? filePath : `${cwd ?? `/`}/${filePath}`;
++  const link = document.createElement(`a`);
++  link.href = `/__backend/download?hostId=local&path=${encodeURIComponent(path)}`;
++  link.download = filePath.split(`/`).pop() || `download`;
++  document.body.append(link);
++  link.click();
++  link.remove();
++}
+ function zkt(e) {
+   let t = (0, RR.c)(92),
+     {
+@@ -59605,7 +59614,15 @@
+   t[34] !== S
+     ? ((L = (e, t) => {
+         let n = t === void 0 ? T : t;
+-        if (w || (_?.(c, e), !E)) return;
++        if (w) return;
++        if (
++          (h == null || h === `local`) &&
++          /\.(?:tar(?:\.(?:gz|bz2|xz|zst))?|tgz|zip|7z|rar|gz)$/i.test(c)
++        ) {
++          codexWebDownloadLinkedArchive(m, c);
++          return;
++        }
++        if (_?.(c, e), !E) return;
+         let r = e.button === 1 || Dkt(e),
+           i = k.get(Lr, { name: `browser.in-app` }).isCapable,
+           a = i && !Pb(A) && rl(c);
