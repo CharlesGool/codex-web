@@ -1,0 +1,26 @@
+--- a/webview/assets/terminal-panel-a6a35533a2c6.js
++++ b/webview/assets/terminal-panel-a6a35533a2c6.js
+@@ -819,6 +819,15 @@
+           },
+           ee = new je.ClipboardAddon(),
+           w = new Me.FitAddon();
++        const cwdSubscription = f.parser.registerOscHandler(777, (value) => {
++          if (!value.startsWith(`codex-web-cwd;`)) return !1;
++          try {
++            const cwd = decodeURIComponent(value.slice(`codex-web-cwd;`.length));
++            if (cwd.startsWith(`/`))
++              queueMicrotask(() => window.codexWebFollowTerminalCwd?.(cwd, a));
++          } catch {}
++          return !0;
++        });
+         ((ie.current = w),
+           f.loadAddon(ee),
+           f.loadAddon(w),
+@@ -936,6 +945,7 @@
+               B.disconnect(),
+               e.removeEventListener(`input`, C, !0),
+               e.removeEventListener(`paste`, C, !0),
++              cwdSubscription.dispose(),
+               L.dispose(),
+               R.dispose(),
+               z.dispose(),

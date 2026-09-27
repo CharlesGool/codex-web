@@ -29,7 +29,7 @@
          r?.());
      },
      je = (e) => {
-@@ -568,6 +567,18 @@
+@@ -568,6 +567,56 @@
      },
      Me = Wa,
      Ne;
@@ -45,6 +45,53 @@
 +      workspaceRoot: folderPath,
 +    });
 +  };
++  window.codexWebFollowTerminalCwd = (folderPath, hostId) => {
++    if (typeof folderPath !== `string` || !folderPath.startsWith(`/`)) return;
++    const previousTabId = window.codexWebTerminalFollowTabId;
++    const tabId = `file:folder:${folderPath}`;
++    m(d, null, {
++      hostId: hostId ?? b.id,
++      tabId,
++      title: folderPath.split(`/`).filter(Boolean).at(-1) ?? folderPath,
++      target: `right`,
++      workspaceRoot: folderPath,
++      replaceTabId: g.some((tab) => tab.tabId === previousTabId) ? previousTabId : void 0,
++    });
++    window.codexWebTerminalFollowTabId = tabId;
++  };
++  window.codexWebOpenPath = async (enteredPath, hostId) => {
++    if (typeof enteredPath !== `string` || !enteredPath.trim())
++      throw new Error(`Enter a path`);
++    const response = await fetch(`/__backend/path-info?path=${encodeURIComponent(enteredPath.trim())}`);
++    if (!response.ok) {
++      const result = await response.json().catch(() => ({}));
++      throw new Error(result.error || `Cannot open this path`);
++    }
++    const result = await response.json();
++    if (result.type === `directory`) {
++      window.codexWebOpenFolder(result.path, hostId);
++    } else {
++      Ln({
++        scope: d,
++        path: result.path,
++        cwd: null,
++        browserEnabled: T,
++        hostConfig: b,
++        hostId: hostId ?? b.id,
++        openInSidePanel: !0,
++      });
++    }
++    return result.path;
++  };
    t[6] !== b || t[7] !== T || t[8] !== d || t[9] !== O
      ? ((Ne = (e, t) => {
          switch (e.type) {
+@@ -729,6 +778,8 @@
+     ].filter(
+       (e) =>
+         !(
++          (c === `bottom` && e.id !== `terminal`) ||
++          (c === `right` && e.id !== `open-file` && e.id !== `side-chat`) ||
+           (e.requiresCodexAccess && !le) ||
+           (p != null && !e.tabType?.dropDestinations.includes(c)) ||
+           (i === `new-tab` && e.tabType?.showInNewTabLauncher === !1)

@@ -1,6 +1,6 @@
 --- a/webview/assets/review-file-source-breadcrumb-ea75e43b8a53.js
 +++ b/webview/assets/review-file-source-breadcrumb-ea75e43b8a53.js
-@@ -2345,6 +2345,14 @@
+@@ -2345,6 +2345,79 @@
        (Q = w()),
        (cn = 500));
    });
@@ -12,10 +12,75 @@
 +  while (count < cwdParts.length && count < fileParts.length - 1 && cwdParts[count] === fileParts[count]) count++;
 +  return `/${(count ? cwdParts.slice(0, count) : fileParts.slice(0, 1)).join(`/`)}`;
 +}
++function codexWebPathEditor({ path, hostId }) {
++  const [entered, setEntered] = yn.useState(path);
++  const [error, setError] = yn.useState(``);
++  const [busy, setBusy] = yn.useState(!1);
++  const chinese = document.documentElement.lang.toLowerCase().startsWith(`zh`);
++  yn.useEffect(() => {
++    setEntered(path);
++    setError(``);
++  }, [path]);
++  async function go(value) {
++    if (busy) return;
++    setBusy(!0);
++    setError(``);
++    try {
++      if (typeof window.codexWebOpenPath !== `function`)
++        throw new Error(chinese ? `路径跳转尚未就绪` : `Path navigation is not ready`);
++      await window.codexWebOpenPath(value, hostId);
++    } catch (reason) {
++      setError(chinese ? `无法打开该路径` : `Cannot open this path`);
++    } finally {
++      setBusy(!1);
++    }
++  }
++  return (0, $.jsx)(`li`, {
++    className: `flex min-w-0 flex-1 items-center gap-1`,
++    children: (0, $.jsxs)(`form`, {
++      className: `flex min-w-0 flex-1 items-center gap-1`,
++      onSubmit: (event) => {
++        event.preventDefault();
++        void go(entered);
++      },
++      children: [
++        (0, $.jsx)(`button`, {
++          type: `button`,
++          className: `shrink-0 rounded px-1 text-xs text-secondary hover:bg-primary-ghost-hover`,
++          title: chinese ? `转到主目录` : `Go to home directory`,
++          onClick: () => void go(`~/`),
++          children: `~/`,
++        }),
++        (0, $.jsx)(`input`, {
++          "aria-label": chinese ? `文件路径` : `File path`,
++          "aria-invalid": !!error,
++          className: `min-w-0 flex-1 rounded border border-transparent bg-transparent px-1 text-xs text-default outline-none hover:border-border focus:border-border`,
++          onChange: (event) => { setEntered(event.target.value); setError(``); },
++          onCopy: (event) => event.stopPropagation(),
++          spellCheck: !1,
++          title: error || entered,
++          value: entered,
++        }),
++        error ? (0, $.jsx)(`span`, {
++          className: `max-w-24 truncate text-xs text-red-600`,
++          role: `alert`,
++          title: error,
++          children: error,
++        }) : null,
++        (0, $.jsx)(`button`, {
++          type: `submit`,
++          className: `shrink-0 rounded px-1 text-xs text-secondary hover:bg-primary-ghost-hover disabled:opacity-40`,
++          disabled: busy,
++          children: chinese ? `前往` : `Go`,
++        }),
++      ],
++    }),
++  });
++}
  function un(e) {
    let t = (0, vn.c)(36),
      {
-@@ -2374,20 +2382,25 @@
+@@ -2374,20 +2447,25 @@
    ) {
      y = Symbol.for(`react.early_return_sentinel`);
      bb0: {
@@ -33,7 +98,7 @@
        }
        let o = e.join(`/`),
 -        s = a == null ? o : Oe(he({ cwd: n, path: a, workspaceRoot: l })),
-+        s = a == null ? root ?? n ?? o : Oe(he({ cwd: n, path: a, workspaceRoot: root })),
++        s = a == null ? root ?? n ?? o : a.startsWith(`/`) ? a : Oe(he({ cwd: n, path: a, workspaceRoot: root })),
          p;
        t[13] !== n || t[14] !== a || t[15] !== l
          ? ((p =
@@ -45,25 +110,47 @@
            (t[13] = n),
            (t[14] = a),
            (t[15] = l),
-@@ -2421,7 +2434,7 @@
-             {
-               className: `flex shrink-0 items-center gap-1`,
-               children: [
+@@ -2412,38 +2490,7 @@
+             (e.preventDefault(),
+             e.clipboardData.setData(`text/plain`, t === o ? s : t));
+         }),
+-        (h = e.map((t, n) => {
+-          let a = n === e.length - 1,
+-            o = b?.[n],
+-            s = we(`whitespace-nowrap`, a && `font-medium text-default`);
+-          return (0, $.jsxs)(
+-            `li`,
+-            {
+-              className: `flex shrink-0 items-center gap-1`,
+-              children: [
 -                o == null || r == null || i == null || l == null
-+                a || o == null || r == null || i == null || root == null
-                   ? (0, $.jsx)(`span`, { className: s, children: t })
-                   : (0, $.jsx)(dn, {
-                       activePath: o.activePath,
-@@ -2431,7 +2444,7 @@
-                       label: t,
-                       labelClassName: s,
-                       onSelectFile: i,
+-                  ? (0, $.jsx)(`span`, { className: s, children: t })
+-                  : (0, $.jsx)(dn, {
+-                      activePath: o.activePath,
+-                      directoryPath: o.directoryPath,
+-                      hostId: r,
+-                      shouldExpandActivePath: !a,
+-                      label: t,
+-                      labelClassName: s,
+-                      onSelectFile: i,
 -                      root: l,
-+                      root,
-                     }),
-                 a
-                   ? null
-@@ -2525,115 +2538,20 @@
+-                    }),
+-                a
+-                  ? null
+-                  : (0, $.jsx)(D, {
+-                      "aria-hidden": !0,
+-                      className: `icon-2xs shrink-0 text-tertiary`,
+-                    }),
+-              ],
+-            },
+-            `${n}:${t}`,
+-          );
+-        })));
++        (h = (0, $.jsx)(codexWebPathEditor, { path: s, hostId: r })));
+     }
+     ((t[0] = n),
+       (t[1] = r),
+@@ -2525,115 +2572,20 @@
    );
  }
  function dn(e) {

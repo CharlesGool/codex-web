@@ -485,6 +485,41 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
     },
   );
 
+  app.get<{ Querystring: { path?: string } }>("/__backend/path-info", async (request, reply) => {
+    const requestedPath = request.query.path;
+    if (typeof requestedPath !== "string" || !requestedPath.trim()) {
+      return reply.code(400).send({ error: "Enter a path" });
+    }
+    const input = requestedPath.trim();
+    const expandedPath = input === "~"
+      ? os.homedir()
+      : input.startsWith("~/")
+        ? path.join(os.homedir(), input.slice(2))
+        : input;
+    if (!path.isAbsolute(expandedPath) || expandedPath.includes("\0")) {
+      return reply.code(400).send({ error: "Enter an absolute path" });
+    }
+    const resolvedPath = path.resolve(expandedPath);
+    try {
+      const stats = await fs.stat(resolvedPath);
+      if (!stats.isDirectory() && !stats.isFile()) {
+        return reply.code(400).send({ error: "Unsupported path type" });
+      }
+      return reply.send({
+        path: resolvedPath,
+        type: stats.isDirectory() ? "directory" : "file",
+      });
+    } catch (error) {
+      if (["ENOENT", "ENOTDIR"].includes((error as NodeJS.ErrnoException).code ?? "")) {
+        return reply.code(404).send({ error: "Path not found" });
+      }
+      if ((error as NodeJS.ErrnoException).code === "EACCES") {
+        return reply.code(403).send({ error: "Path access denied" });
+      }
+      throw error;
+    }
+  });
+
   await app.register(fastifyStatic, {
     root: "/",
     prefix: "/@fs/",

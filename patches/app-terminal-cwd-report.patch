@@ -1,0 +1,31 @@
+--- a/.vite/build/main-C5K7o1Hr.js
++++ b/.vite/build/main-C5K7o1Hr.js
+@@ -131325,6 +131325,20 @@
+   }
+   appendOutput(e, t) {
+     let n = this.sessions.get(e);
++    if (n && process.platform === `linux` && n.backend?.pty?.pid &&
++        !t.startsWith(`\u001b]777;codex-web-cwd;`) && n.codexWebCwdTimer == null) {
++      n.codexWebCwdTimer = setTimeout(() => {
++        n.codexWebCwdTimer = null;
++        if (this.sessions.get(e) !== n) return;
++        try {
++          const cwd = require(`node:fs`).readlinkSync(`/proc/${n.backend.pty.pid}/cwd`);
++          if (cwd.startsWith(`/`) && cwd !== n.codexWebLastCwd) {
++            n.codexWebLastCwd = cwd;
++            this.appendOutput(e, `\u001b]777;codex-web-cwd;${encodeURIComponent(cwd)}\u0007`);
++          }
++        } catch {}
++      }, 80);
++    }
+     n &&
+       ((n.buffer = `${n.buffer}${t}`.slice(-16e3)),
+       n.attached &&
+@@ -131370,6 +131384,7 @@
+         ownerId: e.id,
+         buffer: ``,
+         cwd: i,
++        codexWebLastCwd: i,
+         shell: n.shell,
+         shellKind: n.shellKind,
+         size: { cols: t.cols ?? 80, rows: t.rows ?? 24 },

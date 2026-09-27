@@ -1,14 +1,27 @@
 --- a/webview/assets/review-file-source-item-6a924fa237d9.js
 +++ b/webview/assets/review-file-source-item-6a924fa237d9.js
-@@ -2132,6 +2132,15 @@
+@@ -2132,6 +2132,28 @@
      oe
    );
  }
 +const codexWebFolderRootLists = new Map();
++const codexWebHomeRootLists = new WeakMap();
++function codexWebHomeRoot(path) {
++  return typeof path === `string` ? path.match(/^\/home\/[^/]+/)?.[0] ?? null : null;
++}
++function codexWebHomeRoots(roots, path) {
++  const home = codexWebHomeRoot(path);
++  if (home == null || roots.includes(home)) return roots;
++  const cached = codexWebHomeRootLists.get(roots);
++  if (cached?.home === home) return cached.roots;
++  const withHome = [...roots, home];
++  codexWebHomeRootLists.set(roots, { home, roots: withHome });
++  return withHome;
++}
 +function codexWebFolderRoots(path) {
 +  let roots = codexWebFolderRootLists.get(path);
 +  if (roots == null) {
-+    roots = [path];
++    roots = codexWebHomeRoots([path], path);
 +    codexWebFolderRootLists.set(path, roots);
 +  }
 +  return roots;
@@ -16,16 +29,16 @@
  function vi(e) {
    let t = (0, Ri.c)(48),
      {
-@@ -2154,7 +2163,7 @@
+@@ -2154,7 +2176,7 @@
      y = Nt(bt),
      b = S(),
      x = J(Dt),
 -    C = J($e),
-+    C = s == null && m != null ? codexWebFolderRoots(m) : J($e),
++    C = s == null && m != null ? codexWebFolderRoots(m) : codexWebHomeRoots(J($e), s ?? r ?? m),
      w = r ?? (x == null ? null : p(x)),
      T = s != null && (c || h || g || v),
      E = J(Ze),
-@@ -2307,13 +2316,16 @@
+@@ -2307,13 +2329,16 @@
      ? ((B =
          o == null
            ? null
@@ -49,7 +62,7 @@
              })),
        (t[37] = a),
        (t[38] = o),
-@@ -2324,8 +2336,8 @@
+@@ -2324,8 +2349,8 @@
    let V;
    t[42] !== z || t[43] !== B
      ? ((V = (0, $.jsxs)(`div`, {
