@@ -86,9 +86,9 @@ Documentation and licensing review: The upstream checkout declares MIT in `packa
 - Completed: Kept the upstream extract-then-patch layout, added standard project directories and a new `deploy/start.sh`, and documented the deployment boundaries. Browser fixes cover login and trusted IPs, file actions and previews, static website previews, unsent image removal, conversation search, opening chats in a browser tab, mobile viewport sizing, and unavailable desktop-only features. The help menu links to this fork. Voice actions are hidden, Voice settings and ordinary ChatGPT history are marked unavailable, and the local changelog page now follows the selected app language. The conversation search popover now uses an existing theme surface class so its background is opaque. These static assets were installed on the live site without a restart.
 - Checks: Earlier patch replay, JavaScript syntax, authentication, and browser-size checks passed. This pass rebuilt the extracted client from the desktop package through asset compression, verified that the search popover uses a generated background class, and passed the 32-document format, translation, and project-structure checks with 0 errors. Playwright could not run because Chrome is not installed. Authenticated browser checks remain outstanding.
 - Deployment: `codex-web.service` remains active on its registered LAN endpoint. The current process was already running before this static update; this change did not restart it. Its static assets were updated under `~/Desktop/apps/codex-web`; the earlier deployment at `~/Desktop/app/codex-web` and a backup of the replaced files remain available for rollback. The changelog route returned HTTP 401 without a session, as expected. Any future operator-initiated restart requires fresh, explicit user confirmation after the impact is stated.
-- GitHub: The public `CharlesGool/codex-web` repository uses `main`; commit `f3bad65` was pushed and the remote branch was verified. This search-style fix is pending final review and push.
+- GitHub: The public `CharlesGool/codex-web` repository uses `main`; commit `98c2caf` was pushed and the remote branch was verified.
 - Remaining: Review natural wording in all translated documents and the third-party license texts. Test the changed UI after a hard refresh in an authenticated browser, including the voice controls, ChatGPT history notice, changelog menu and page, and physical iPhone, Android, and tablet portrait and landscape layouts. No rolling update is planned. No temporary project rules file was found.
-- Next action: Review and push the search-style fix to `main`, then complete an authenticated browser check when Chrome is available.
+- Next action: Complete an authenticated browser check when Chrome is available.
 
 ## Changelog
 
@@ -130,6 +130,7 @@ Documentation and licensing review: The upstream checkout declares MIT in `packa
 | `9a2d0a9` | Record the verified GitHub handoff. |
 | `74acac2` | Follow the selected app language in the changelog. |
 | `f3bad65` | Record the verified language-fix handoff. |
-| Current commit | Restore the conversation search background. |
+| `98c2caf` | Restore the conversation search background. |
+| Current commit | Record the verified search-style handoff. |
 
 The Git log remains the authoritative history.

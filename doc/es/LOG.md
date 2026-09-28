@@ -85,9 +85,9 @@ Revisión de documentación y licencias: el proceso de pago ascendente declara M
 - Completado: Se conservó la estructura de extracción y parches del proyecto original, se añadieron los directorios estándar y `deploy/start.sh`, y se documentaron los límites del despliegue. Los cambios web abarcan el inicio de sesión y las IP de confianza, archivos y vistas previas, vista estática de sitios, eliminación de imágenes no enviadas, búsqueda en chats, apertura en otra pestaña, tamaños móviles y estados no disponibles para funciones de escritorio. El menú de ayuda enlaza este proyecto. En este trabajo se ocultan las acciones de voz, se indica que los ajustes de Voz y el historial normal de ChatGPT no están disponibles y se añade una página local de cambios. Los archivos estáticos se instalaron en el sitio activo sin reiniciar. La página de cambios ahora sigue el idioma elegido en la aplicación. La ventana flotante de búsqueda usa ahora una superficie del tema existente y no deja ver el contenido de detrás.
 - Comprobaciones: Las verificaciones anteriores de aplicación de parches, sintaxis JavaScript, autenticación y tamaños de navegador pasaron. Esta vez se aplicó el parche nuevo, se comprobó la sintaxis de los dos archivos JavaScript modificados y de la página de cambios, se verificó mediante un simulador el contenido en los ocho idiomas y pasaron las comprobaciones de formato, traducción y estructura de 32 documentos con 0 errores. Playwright no pudo ejecutarse porque Chrome no está instalado. La reconstrucción completa del cliente extraído desde el paquete de escritorio, incluida la compresión de recursos, pasó. Faltan pruebas en un navegador autenticado. También se verificó que el idioma de la aplicación prevalece sobre el del navegador y que la reconstrucción completa con parches terminó correctamente. Esta vez se reconstruyó por completo el cliente extraído y se verificó que la clase de fondo de la búsqueda existe en la hoja de estilos.
 - Despliegue: `codex-web.service` sigue activo en su dirección LAN registrada y el proceso actual ya estaba en ejecución antes de esta actualización estática; este cambio no reinició el servicio. Los archivos estáticos se actualizaron en `~/Desktop/apps/codex-web`; el despliegue anterior en `~/Desktop/app/codex-web` y una copia de los archivos reemplazados permiten volver atrás. La ruta del historial de cambios respondió HTTP 401 sin sesión, como se esperaba. Cualquier reinicio manual futuro requiere una nueva confirmación expresa después de explicar su efecto.
-- GitHub: El repositorio público `CharlesGool/codex-web` usa `main`; el commit `f3bad65` se envió y se verificó la rama remota. Esta corrección del estilo de búsqueda espera la revisión final y el envío.
+- GitHub: El repositorio público `CharlesGool/codex-web` usa `main`; el commit `98c2caf` se envió y se verificó la rama remota.
 - Pendiente: Revisar la naturalidad de todas las traducciones y los textos de licencia de terceros. Tras recargar en un navegador autenticado, probar los controles de voz, el aviso del historial de ChatGPT, el menú y la página de cambios, y iPhone, Android y tabletas reales en vertical y horizontal. No se prevé una actualización gradual. No se encontró ningún archivo de reglas temporales del proyecto.
-- Siguiente paso: Revisar y enviar la corrección del estilo de búsqueda a `main`; completar la prueba en un navegador autenticado cuando Chrome esté disponible.
+- Siguiente paso: Completar la prueba en un navegador autenticado cuando Chrome esté disponible.
 
 ## Historial de cambios
 
@@ -130,6 +130,7 @@ Revisión de documentación y licencias: el proceso de pago ascendente declara M
 | `9a2d0a9` | Registrar el traspaso verificado a GitHub. |
 | `74acac2` | Usar el idioma elegido en la aplicación para la página de cambios. |
 | `f3bad65` | Registrar el traspaso verificado de la corrección del idioma. |
-| Commit actual | Restaurar el fondo de la búsqueda de conversaciones. |
+| `98c2caf` | Restaurar el fondo de la búsqueda de conversaciones. |
+| Commit actual | Registrar el traspaso verificado de la corrección de búsqueda. |
 
 El historial de Git sigue siendo la fuente definitiva.
