@@ -44,6 +44,7 @@ El servidor web y el cliente extraído tienen versiones por separado.`scripts/pr
 - Las acciones de archivos del navegador deben pasar a través de rutas de servidor autenticadas. Las vistas previas de sitios web estáticos no ejecutan el backend del proyecto de destino.
 - Un control de UI que elimina un archivo adjunto no enviado debe llamar a la devolución de llamada de eliminación existente del compositor; El contenido enviado no tiene acción de eliminación.
 - Un cambio de servidor necesita reiniciar el servicio. Prepárelo y verifíquelo primero, luego solicite una confirmación explícita porque el reinicio interrumpe las conversaciones en vivo. La sustitución de activos estáticos se puede comprobar sin reiniciar el proceso.
+- Desactive las entradas heredadas de voz y dictado en este despliegue web. La página de ajustes de Voz y la lista del historial de ChatGPT muestran que no están disponibles; los chats de Codex siguen accesibles.
 
 ## Diseño de datos
 

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Codex Web</title>
+  <style>
+    :root{font-family:Inter,"Noto Sans SC",system-ui,sans-serif;color-scheme:light dark}
+    *{box-sizing:border-box}
+    body{margin:0;background:#f7f8fa;color:#233246;line-height:1.5}
+    header{background:#fff;border-bottom:1px solid #dfe5ea}
+    .bar{max-width:840px;margin:auto;padding:20px 24px;display:flex;gap:20px;align-items:center;justify-content:space-between}
+    h1{font-size:20px;margin:0;font-weight:650}
+    a{color:#385c7e;text-decoration:none}
+    a:hover{text-decoration:underline}
+    a:focus-visible{outline:2px solid #385c7e;outline-offset:4px;border-radius:4px}
+    main{max-width:840px;margin:32px auto;padding:0 24px 48px}
+    article{background:#fff;border:1px solid #dfe5ea;border-radius:12px;padding:24px}
+    h2{font-size:20px;margin:0 0 20px}
+    h3{font-size:16px;margin:24px 0 8px}
+    ul{padding-left:24px;margin:8px 0 0}
+    li+li{margin-top:10px}
+    p{color:#64748b}
+    @media(max-width:600px){main{margin-top:16px}article{padding:20px}.bar{padding:16px}}
+    @media(prefers-color-scheme:dark){body{background:#141a20;color:#e7edf3}header,article{background:#202933;border-color:#3a4652}a{color:#a6c5e3}p{color:#a6b4c1}}
+  </style>
+</head>
+<body>
+  <header><div class="bar"><h1 id="title"></h1><a id="home" href="/"></a></div></header>
+  <main><article id="content" role="status"></article></main>
+  <script>
+    (async () => {
+      const requested = navigator.language;
+      const supported = ["en", "zh-CN", "zh-TW", "zh-HK", "hi", "es", "ar", "fr"];
+      const language = supported.find(tag => tag.toLowerCase() === requested.toLowerCase())
+        ?? supported.find(tag => tag === requested.split("-")[0])
+        ?? (requested.startsWith("zh") ? "zh-CN" : "en");
+      document.documentElement.lang = language;
+      document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+      const content = document.getElementById("content");
+      let labels;
+      try {
+        const [labelsResponse, logResponse] = await Promise.all([
+          fetch(`/changelog-${language}.json`),
+          fetch(`/changelog-${language}.md`),
+        ]);
+        if (!labelsResponse.ok || !logResponse.ok) throw new Error("load failed");
+        labels = await labelsResponse.json();
+        document.title = `${labels.title} · Codex Web`;
+        document.getElementById("title").textContent = labels.title;
+        document.getElementById("home").textContent = labels.home;
+        content.textContent = labels.loading;
+        const source = await logResponse.text();
+        const lines = source.split(/\r?\n/);
+        const start = lines.findIndex(line => line.trim() === `## ${labels.sectionHeading}`);
+        if (start < 0) throw new Error("section missing");
+        content.replaceChildren();
+        let list = null;
+        for (const line of lines.slice(start + 1)) {
+          if (line.startsWith("## ")) break;
+          const heading = /^(#{3,4})\s+(.+)$/.exec(line);
+          if (heading) {
+            const element = document.createElement(heading[1].length === 3 ? "h2" : "h3");
+            element.textContent = heading[2].replaceAll("`", "");
+            content.append(element);
+            list = null;
+          } else if (line.startsWith("- ")) {
+            if (!list) {
+              list = document.createElement("ul");
+              content.append(list);
+            }
+            const item = document.createElement("li");
+            item.textContent = line.slice(2).replaceAll("`", "");
+            list.append(item);
+          }
+        }
+        if (!content.childElementCount) content.textContent = labels.empty;
+        content.removeAttribute("role");
+      } catch {
+        document.getElementById("title").textContent = "Codex Web";
+        content.textContent = labels?.error ?? "";
+      }
+    })();
+  </script>
+</body>
+</html>

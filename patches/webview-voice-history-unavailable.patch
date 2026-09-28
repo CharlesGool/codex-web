@@ -1,0 +1,87 @@
+--- a/webview/assets/app-initial-236e1501144c.js
++++ b/webview/assets/app-initial-236e1501144c.js
+@@ -347917,7 +347917,7 @@
+           configFeatures: [
+             { key: `in_app_dictation`, host: `default`, clients: [`electron`] },
+           ],
+-          supportedClients: [`browser`, `chrome-extension`, `electron`],
++          supportedClients: [`unsupported`],
+           children: {
+             "dictation.composer": { accessPolicy: `dictation` },
+             "dictation.global": {
+@@ -407077,8 +407077,8 @@
+             (
+               await W(
+                 async () => {
+-                  let { VoiceSettings: e } = await import(
+-                    `./voice-settings-8bc6c209b06b.js`
++                  let { PetsSettingsRoute: e } = await import(
++                    `./pets-settings-route-66d8bd66f50e.js`
+                   );
+                   return { VoiceSettings: e };
+                 },
+--- a/webview/assets/app-primary-6b28e06666ff.js
++++ b/webview/assets/app-primary-6b28e06666ff.js
+@@ -312242,7 +312242,17 @@
+       }),
+       titleActionsOnHover: !0,
+       children:
+-        ke.isConversationError && $e.chatKeys.length === 0
++        a === `chatgpt` && $e.chatKeys.length === 0
++          ? (0, d4.jsx)(`div`, {
++              className: `px-[var(--padding-row-cell-x,var(--padding-row-x))] py-3 text-sm text-codex-description`,
++              role: `status`,
++              children: (0, d4.jsx)(Y, {
++                id: `codexWeb.chatHistoryUnavailable`,
++                defaultMessage: `ChatGPT chats from the web or mobile are unavailable in this site.`,
++                description: `Explains why the browser-hosted fork cannot list account ChatGPT chats`,
++              }),
++            })
++          : ke.isConversationError && $e.chatKeys.length === 0
+           ? (0, d4.jsx)(`div`, {
+               className: `px-[var(--padding-row-cell-x,var(--padding-row-x))] py-1.5 text-sm text-codex-description`,
+               children: (0, d4.jsx)(Y, { ...d2.error }),
+@@ -316316,6 +316326,7 @@
+       (t[7] = i),
+       (t[8] = d))
+     : (d = t[8]);
++  d = null;
+   let f;
+   return (
+     t[9] !== d || t[10] !== n
+@@ -317059,6 +317070,17 @@
+     },
+     children: navigator.language.startsWith(`zh`) ? `关于 Codex Web` : `About Codex Web`,
+   });
++  let changelog = (0, w4.jsx)(Cp.Item, {
++    LeftIcon: Se,
++    onSelect: () => {
++      window.open(`/changelog.html`, `_blank`, `noopener,noreferrer`);
++    },
++    children: (0, w4.jsx)(Y, {
++      id: `codexWeb.help.changelog`,
++      defaultMessage: `Changelog`,
++      description: `Help menu item that opens this fork's changelog`,
++    }),
++  });
+   let w;
+   return (
+     t[24] !== n ||
+@@ -317076,7 +317098,7 @@
+           side: `top`,
+           sideOffset: 6,
+           triggerButton: p,
+-          children: [m, h, g, _, v, y, b, S, about, C],
++          children: [m, h, g, _, v, y, b, S, changelog, about, C],
+         })),
+         (t[24] = n),
+         (t[25] = S),
+@@ -336560,7 +336582,7 @@
+     o = Vl(),
+     s = i.thread.phase,
+     c = s === `starting` || s === `active`,
+-    l = n && r && s === `inactive` && i.isStartAvailable,
++    l = !1,
+     u;
+   t[0] !== o || t[1] !== a
+     ? ((u = a

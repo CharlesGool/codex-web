@@ -76,20 +76,22 @@ Examen de la documentation et des licences : la caisse en amont déclare MIT da
 |Prévisualisez les fichiers locaux liés à une conversation dans un onglet de navigateur authentifié.|L'onglet de l'éditeur de fichiers de bureau peut ne pas parvenir à s'afficher sur l'hébergeur Web. L'aperçu lit le point de terminaison de téléchargement authentifié existant, affiche le texte, les images ou les PDF et propose le téléchargement. Les liens d'hôte distant conservent leur action d'origine.|
 |Ajoutez un bouton de recherche à l'en-tête de la conversation à l'aide de la commande findin-chat existante.|Le client dispose déjà d'une barre de recherche avec le nombre de correspondances et la navigation précédente/suivante ; l'en-tête n'avait pas de point d'entrée visible.|
 |Dimensionnez l'application Web en fonction de la fenêtre d'affichage visuelle du navigateur sur mobile et tablette.|L'hérédité`100vh`la hauteur des racines et des coques peut dépasser la zone laissée par les barres dynamiques du navigateur ou le clavier à l'écran. La fenêtre visuelle indique également son décalage supérieur, qui peut changer lorsque le clavier est visible.|
+|Signaler la voix et l’historique des conversations ChatGPT ordinaires comme indisponibles dans ce navigateur.|La page HTTP actuelle ne peut pas accéder au microphone, les fonctions vocales du bureau ne sont pas transférées automatiquement et le serveur Codex app-server local ne répertorie pas les conversations ordinaires du compte ChatGPT. Les actions vocales sont masquées, les conversations Codex conservées.|
+|Ouvrir une page locale des modifications depuis le menu au point d’interrogation.|L’utilisateur a demandé un historique visible des mises à jour de ce projet; la page lit le journal localisé fourni avec les ressources statiques.|
 
 ## Passation
 
 - Branche: `main`, avancée sans fusion depuis `feat/standardize-layout`. Les changements du navigateur et de la documentation sont publiés sur la branche par défaut.
-- Terminé: La structure d'extraction puis de correctifs héritée du projet a été conservée; les répertoires standard et `deploy/start.sh` ont été ajoutés, et les limites du déploiement documentées. Les correctifs concernent la connexion, les IP de confiance, les fichiers et leurs aperçus, les sites statiques, la suppression des images non envoyées, la recherche dans les conversations, l'ouverture d'une conversation dans un autre onglet, l'affichage mobile et les fonctions de bureau indisponibles. Le menu d'aide renvoie vers ce fork.
-- Vérifications: Les contrôles antérieurs des correctifs, de la syntaxe JavaScript, de l’authentification et des tailles de fenêtre ont réussi. Cette passe a aussi terminé la compilation du serveur TypeScript, les contrôles de syntaxe Shell et Python et les contrôles de structure et de format des 32 documents: 0 erreur et 10 avertissements sur les libellés de langue et les formulations non normatives. La reconstruction complète du client extrait et les essais connectés sur appareils réels restent à faire.
-- Déploiement: Le dernier redémarrage de `codex-web.service` autorisé par l'utilisateur date du 2026-09-27. Le service utilise `~/Desktop/apps/codex-web` et `deploy/start.sh`; l'ancien déploiement reste dans `~/Desktop/app/codex-web` pour permettre un retour en arrière. Les modifications ultérieures du navigateur ont été installées comme ressources statiques sans autre redémarrage. Tout nouveau redémarrage manuel exige une confirmation explicite après présentation de ses conséquences.
-- GitHub: La branche `main` du dépôt public `CharlesGool/codex-web` pointe sur `7347aa6`; le commit distant a été comparé à la branche locale.
-- À faire: Relire la qualité de toutes les traductions et les textes des licences tierces. Tester l’interface après actualisation forcée dans un navigateur connecté, notamment sur de vrais iPhone, appareils Android et tablettes en mode portrait et paysage. Aucune mise à jour progressive n’est prévue. Aucun fichier de règles temporaires du projet n’a été trouvé.
-- Prochaine étape: Après publication, effectuer les essais sur appareils et navigateurs. Demander une nouvelle autorisation avant tout redémarrage.
+- Terminé: La structure amont avec extraction puis correctifs, les répertoires standard et `deploy/start.sh` ont été conservés ou ajoutés, et les limites du déploiement documentées. Les corrections Web couvrent la connexion et les IP de confiance, les actions sur les fichiers et leurs aperçus, les aperçus statiques de sites, la suppression d’images non envoyées, la recherche dans les conversations, l’ouverture dans un nouvel onglet, l’adaptation mobile et l’indication des fonctions propres au bureau indisponibles. Le menu d’aide renvoie à ce projet. Ce travail masque les actions vocales, signale les réglages vocaux et l’historique ChatGPT ordinaire comme indisponibles et ajoute une page locale des modifications. Ces ressources statiques ont été installées sur le site actif sans redémarrage.
+- Vérifications: Les contrôles précédents sur les correctifs, la syntaxe JavaScript, l’authentification et les tailles de navigateur ont réussi. Cette fois, le nouveau correctif a été appliqué, la syntaxe des deux fichiers JavaScript modifiés et du script de la page des modifications a été vérifiée, le rendu des huit langues documentaires a été simulé et les contrôles de format, de traduction et de structure des 32 documents ont réussi avec 0 erreur. Playwright n’a pas pu être exécuté car Chrome n’est pas installé. La reconstruction complète du client extrait du paquet de bureau, jusqu’à la compression des ressources, a réussi. Les contrôles dans un navigateur connecté restent à faire.
+- Déploiement: `codex-web.service` reste actif sur son adresse LAN enregistrée avec le même processus démarré le 2026-09-27. Les ressources statiques ont été mises à jour dans `~/Desktop/apps/codex-web`; l’ancien déploiement dans `~/Desktop/app/codex-web` et une copie des fichiers remplacés restent disponibles pour revenir en arrière. Sans session, la page des modifications a répondu HTTP 401 comme prévu. Tout redémarrage manuel ultérieur exige une nouvelle confirmation explicite après explication de son effet.
+- GitHub: Le dépôt public `CharlesGool/codex-web` utilise `main`; la publication de ce changement attend la revue finale et l’envoi.
+- À faire: Relire la qualité de toutes les traductions et les textes des licences tierces. Après actualisation forcée dans un navigateur connecté, tester les commandes vocales, l’avis sur l’historique ChatGPT, le menu et la page des modifications, ainsi que de vrais iPhone, appareils Android et tablettes en portrait et paysage. Aucune mise à jour progressive n’est prévue. Aucun fichier de règles temporaires du projet n’a été trouvé.
+- Prochaine étape: Examiner les fichiers modifiés et envoyer `main` sur GitHub; terminer le contrôle dans un navigateur connecté lorsque Chrome sera disponible.
 
 ## Historique des modifications
 
-### 0.0.1 (inédit ; travail mis à jour le 2026-09-27)
+### 0.0.1 (inédit ; travail mis à jour le 2026-09-28)
 
 #### Modifié
 
@@ -98,6 +100,7 @@ Examen de la documentation et des licences : la caisse en amont déclare MIT da
 - Les paramètres d'animaux de compagnie, de raccourcis clavier et d'utilisation de l'ordinateur affichent un état indisponible ; le menu Aide de la barre latérale ne propose plus la configuration de l'extension Chrome. Les tâches planifiées affichent désormais un état indisponible spécifique au déploiement au lieu d'une liste de cloud interrompue et de suggestions de tâches. L'action du profil d'animal de compagnie, la commande barre oblique d'animal de compagnie, l'entrée d'aide de raccourci, les liaisons de raccourci d'application, le menu d'application de bureau et le paramètre de destination d'ouverture de fichier par défaut obsolète sont masqués ou désactivés dans l'interface utilisateur Web.
 - Le projet conserve la disposition de construction héritée en amont tout en déplaçant la nouvelle structure propriétaire et le lanceur de services vers des répertoires standard.
 
+- Les commandes vocales du navigateur sont masquées ou signalées comme indisponibles; la zone d’historique ChatGPT explique que les conversations ordinaires du Web et du mobile ne peuvent pas être synchronisées ici. Le menu d’aide latéral ouvre désormais une page locale des modifications.
 #### Fixé
 
 - Les cartes de ressources de sites Web locaux ouvrent un aperçu statique du navigateur au lieu d'appeler le navigateur intégré à l'application, indisponible.
@@ -120,6 +123,7 @@ Examen de la documentation et des licences : la caisse en amont déclare MIT da
 | `b10b9e5` |Alignez l'action d'aperçu et repensez la connexion.|
 | `b11f385` | Terminer les correctifs du navigateur et la documentation du projet. |
 | `7347aa6` | Consigner la passation vérifiée sur GitHub. |
-| Commit actuel | Consigner la mise à jour de la branche par défaut. |
+| `47b2ab3` | Consigner la mise à jour de la branche par défaut. |
+| Commit actuel | Signaler les fonctions du navigateur indisponibles et ajouter la page des modifications. |
 
 Le journal Git reste la référence complète de l’historique.

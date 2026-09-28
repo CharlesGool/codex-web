@@ -49,6 +49,7 @@ metadata:
 - 网页使用主机上已登录的 Codex CLI.本地文件可以下载; 如果另行配置了 File Browser, 也可以在那里打开.
 - 网站资源只会打开静态界面预览, 不会启动该网站的后端.
 - 尚未发送的图片可从缩略图或全屏预览中移除; 移除后不会随草稿发送.
+- 此网站不支持同步 ChatGPT 网页或手机中的普通聊天记录. 语音功能在这里不可用, 语音设置页会显示相应提示. 左下角问号菜单可打开本项目的更新日志.
 - `CODEX_CLI_PATH` 用于选择 CLI.运行工具不在 `PATH` 中时, 可用 `CODEX_WEB_NODE_BIN_DIR` 和 `CODEX_WEB_GIT_BIN_DIR` 指定目录.`CODEX_WEB_AUTH_FILE` 与 `CODEX_WEB_TRUSTED_IPS_FILE` 用于指定认证文件.轮换密码和管理可信 IP 的命令见[原项目说明存档](third_party/codex-web/README.previous.md).
 - 如果替换网页资源后文件名没有变化, 浏览器可能短暂使用缓存; 此时请强制刷新页面.
 

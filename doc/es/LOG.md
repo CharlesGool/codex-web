@@ -76,20 +76,22 @@ Revisión de documentación y licencias: el proceso de pago ascendente declara M
 |Obtenga una vista previa de los archivos locales vinculados desde una conversación en una pestaña del navegador autenticada.|Es posible que la pestaña del editor de archivos de escritorio no se muestre en el servidor web. La vista previa lee el punto final de descarga autenticado existente, muestra texto, imágenes o archivos PDF y ofrece la descarga. Los enlaces de host remoto mantienen su acción original.|
 |Agregue un botón de búsqueda al encabezado de la conversación usando el comando existente de buscar en el chat.|El cliente ya tiene una barra de búsqueda con recuentos de coincidencias y navegación anterior/siguiente; el encabezado carecía de un punto de entrada visible.|
 |Ajuste el tamaño de la aplicación web a la ventana visual del navegador en dispositivos móviles y tabletas.|lo heredado`100vh`Las alturas de la raíz y el shell pueden exceder el área dejada por las barras dinámicas del navegador o el teclado en pantalla. La ventana gráfica también informa su desplazamiento superior, que puede cambiar mientras el teclado está visible.|
+|Mostrar la voz y el historial normal de ChatGPT como no disponibles en este sitio.|La página HTTP actual no puede acceder al micrófono, la voz del escritorio no se traslada automáticamente y el servidor local Codex app-server no enumera los chats normales de la cuenta de ChatGPT. Se ocultan las acciones de voz y se conservan los chats de Codex.|
+|Abrir una página local de cambios desde el menú del signo de interrogación.|El usuario pidió un historial visible de este proyecto; la página lee el registro localizado incluido en los archivos estáticos.|
 
 ## Traspaso
 
 - Rama: `main`, actualizada por avance rápido desde `feat/standardize-layout`. Los cambios del navegador y la documentación están publicados en la rama predeterminada.
-- Completado: Se conservó la estructura original de extracción y aplicación de parches, se añadieron directorios estándar y `deploy/start.sh`, y se documentaron los límites del despliegue. Las correcciones abarcan el inicio de sesión, las IP de confianza, los archivos y sus vistas previas, los sitios estáticos, la eliminación de imágenes no enviadas, la búsqueda en conversaciones, la apertura de conversaciones en otra pestaña, la vista móvil y las funciones de escritorio no disponibles. El menú de ayuda enlaza a este fork.
-- Comprobaciones: Pasaron las pruebas anteriores de parches, sintaxis JavaScript, autenticación y tamaños de navegador. Esta revisión completó además la compilación del servidor TypeScript, las comprobaciones de sintaxis Shell y Python y las de estructura y formato de 32 documentos: 0 errores y 10 avisos sobre etiquetas de idioma y redacción no normativa. Siguen pendientes una compilación completa del cliente extraído y las pruebas con sesión iniciada en dispositivos físicos.
-- Despliegue: El último reinicio de `codex-web.service` autorizado por el usuario fue el 2026-09-27. El servicio utiliza `~/Desktop/apps/codex-web` y `deploy/start.sh`; se conserva una instalación anterior en `~/Desktop/app/codex-web` para volver atrás. Los cambios posteriores del navegador se instalaron como recursos estáticos sin reiniciar. Todo futuro reinicio manual exige una confirmación nueva y explícita tras explicar su impacto.
-- GitHub: La rama `main` del repositorio público `CharlesGool/codex-web` apunta a `7347aa6`; se comprobó que el commit remoto coincide con la rama local.
-- Pendiente: Revisar la naturalidad de todas las traducciones y los textos de licencia de terceros. Probar la interfaz tras una recarga completa en un navegador autenticado, incluidos iPhone, Android y tabletas reales en vertical y horizontal. No se prevé una actualización gradual. No se encontró ningún archivo de reglas temporales del proyecto.
-- Siguiente paso: Después de publicar, completar las pruebas de dispositivos y navegador. Solicitar autorización aparte antes de otro reinicio.
+- Completado: Se conservó la estructura de extracción y parches del proyecto original, se añadieron los directorios estándar y `deploy/start.sh`, y se documentaron los límites del despliegue. Los cambios web abarcan el inicio de sesión y las IP de confianza, archivos y vistas previas, vista estática de sitios, eliminación de imágenes no enviadas, búsqueda en chats, apertura en otra pestaña, tamaños móviles y estados no disponibles para funciones de escritorio. El menú de ayuda enlaza este proyecto. En este trabajo se ocultan las acciones de voz, se indica que los ajustes de Voz y el historial normal de ChatGPT no están disponibles y se añade una página local de cambios. Los archivos estáticos se instalaron en el sitio activo sin reiniciar.
+- Comprobaciones: Las verificaciones anteriores de aplicación de parches, sintaxis JavaScript, autenticación y tamaños de navegador pasaron. Esta vez se aplicó el parche nuevo, se comprobó la sintaxis de los dos archivos JavaScript modificados y de la página de cambios, se verificó mediante un simulador el contenido en los ocho idiomas y pasaron las comprobaciones de formato, traducción y estructura de 32 documentos con 0 errores. Playwright no pudo ejecutarse porque Chrome no está instalado. La reconstrucción completa del cliente extraído desde el paquete de escritorio, incluida la compresión de recursos, pasó. Faltan pruebas en un navegador autenticado.
+- Despliegue: `codex-web.service` sigue activo en su dirección LAN registrada con el mismo proceso iniciado el 2026-09-27. Los archivos estáticos se actualizaron en `~/Desktop/apps/codex-web`; el despliegue anterior en `~/Desktop/app/codex-web` y una copia de los archivos reemplazados permiten volver atrás. La ruta del historial de cambios respondió HTTP 401 sin sesión, como se esperaba. Cualquier reinicio manual futuro requiere una nueva confirmación expresa después de explicar su efecto.
+- GitHub: El repositorio público `CharlesGool/codex-web` usa `main`; la publicación de este cambio espera la revisión final y el envío.
+- Pendiente: Revisar la naturalidad de todas las traducciones y los textos de licencia de terceros. Tras recargar en un navegador autenticado, probar los controles de voz, el aviso del historial de ChatGPT, el menú y la página de cambios, y iPhone, Android y tabletas reales en vertical y horizontal. No se prevé una actualización gradual. No se encontró ningún archivo de reglas temporales del proyecto.
+- Siguiente paso: Revisar los archivos modificados y enviar `main` a GitHub; completar la prueba en un navegador autenticado cuando Chrome esté disponible.
 
 ## Historial de cambios
 
-### 0.0.1 (inédito; trabajo actualizado el 27 de septiembre de 2026)
+### 0.0.1 (inédito; trabajo actualizado el 28 de septiembre de 2026)
 
 #### Cambió
 
@@ -98,6 +100,7 @@ Revisión de documentación y licencias: el proceso de pago ascendente declara M
 - Las mascotas, los atajos de teclado y la configuración de Uso de la computadora muestran un estado no disponible; El menú Ayuda de la barra lateral ya no ofrece la configuración de la extensión de Chrome. Las tareas programadas ahora muestran un estado no disponible específico de la implementación en lugar de una lista de nubes rotas y sugerencias de tareas. La acción del perfil de mascota, el comando de barra diagonal de mascota, la entrada de ayuda de acceso directo, los enlaces de acceso directo a aplicaciones, el menú de aplicaciones de escritorio y la configuración de destino de apertura de archivos predeterminada obsoleta están ocultas o deshabilitadas en la interfaz de usuario web.
 - El proyecto mantiene el diseño de compilación ascendente heredado mientras mueve la nueva estructura propia y el iniciador de servicios a directorios estándar.
 
+- Los controles de voz del navegador se ocultan o se muestran como no disponibles; el área de historial de ChatGPT explica que los chats normales de la web y del móvil no pueden sincronizarse aquí. El menú de ayuda lateral abre ahora una página local de cambios.
 #### Fijado
 
 - Las tarjetas de recursos del sitio web local abren una vista previa estática del navegador en lugar de invocar el navegador de la aplicación que no está disponible.
@@ -120,6 +123,7 @@ Revisión de documentación y licencias: el proceso de pago ascendente declara M
 | `b10b9e5` |Alinee la acción de vista previa y rediseñe el inicio de sesión.|
 | `b11f385` | Completar las correcciones del navegador y la documentación del proyecto. |
 | `7347aa6` | Registrar el traspaso verificado en GitHub. |
-| Commit actual | Registrar la actualización de la rama predeterminada. |
+| `47b2ab3` | Registrar la actualización de la rama predeterminada. |
+| Commit actual | Indicar las funciones del navegador no disponibles y añadir la página de cambios. |
 
 El historial de Git sigue siendo la fuente definitiva.

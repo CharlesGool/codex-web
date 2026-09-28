@@ -4,6 +4,14 @@ set -euxo pipefail
 unzip -o "$HOSTED_CODEX_APP_ZIP" -d scratch/
 asar extract "scratch/ChatGPT.app/Contents/Resources/app.asar" "scratch/asar"
 cp assets/* scratch/asar/webview/
+for changelog_lang in en zh-CN zh-TW zh-HK hi es ar fr; do
+  if [[ "$changelog_lang" == en ]]; then
+    cp doc/LOG.md scratch/asar/webview/changelog-en.md
+  else
+    cp "doc/$changelog_lang/LOG.md" "scratch/asar/webview/changelog-$changelog_lang.md"
+  fi
+  cp "lang/changelog/$changelog_lang.json" "scratch/asar/webview/changelog-$changelog_lang.json"
+done
 PWA_SOURCE_ICON="scratch/asar/webview/assets/app-f483cb0295ed.png"
 PWA_TARGET_ICON="scratch/asar/webview/assets/pwa-icon-512.png"
 PWA_ICON_SIZE=512
@@ -70,7 +78,8 @@ patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-dis
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-help-about-search-style.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-computer-use-unavailable.patch
 patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-automations-unavailable.patch
+patch --batch --forward --strip 1 --directory scratch/asar < patches/webview-voice-history-unavailable.patch
 python3 scripts/patch_webview_project_locale.py
 rm -rf scratch/asar/node_modules/better-sqlite3
-./scripts/prepare_native_terminal
+bash ./scripts/prepare_native_terminal
 node ./scripts/compress_webview_assets.mjs

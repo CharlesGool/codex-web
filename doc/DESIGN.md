@@ -44,6 +44,7 @@ The web host and the extracted client are versioned separately. `scripts/prepare
 - Browser file actions must pass through authenticated server routes. Static website previews do not execute the target project's backend.
 - A UI control that removes an unsent attachment must call the composer's existing removal callback; sent content has no removal action.
 - A server change needs a service restart. Prepare and check it first, then ask for explicit confirmation because the restart interrupts live conversations. Static asset replacement can be checked without restarting the process.
+- Disable the inherited voice and dictation entry points in this browser deployment. Show an unavailable state on the Voice settings route and on the ChatGPT chat-history list; Codex threads remain available.
 
 ## Data Design
 

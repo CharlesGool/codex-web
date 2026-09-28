@@ -44,6 +44,7 @@ L'hébergeur Web et le client extrait sont versionnés séparément.`scripts/pre
 - Les actions sur les fichiers du navigateur doivent passer par des routes de serveur authentifiées. Les aperçus de sites Web statiques n'exécutent pas le backend du projet cible.
 - Un contrôle d'interface utilisateur qui supprime une pièce jointe non envoyée doit appeler le rappel de suppression existant du compositeur ; le contenu envoyé n’a aucune action de suppression.
 - Un changement de serveur nécessite un redémarrage du service. Préparez-le et vérifiez-le d'abord, puis demandez une confirmation explicite car le redémarrage interrompt les conversations en direct. Le remplacement des actifs statiques peut être vérifié sans redémarrer le processus.
+- Désactiver les accès hérités à la voix et à la dictée dans ce déploiement Web. Les réglages vocaux et la liste des conversations ChatGPT affichent leur indisponibilité; l’historique des conversations Codex reste accessible.
 
 ## Conception des données
 
