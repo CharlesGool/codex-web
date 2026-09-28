@@ -6,7 +6,7 @@ metadata:
   lang: "zh-HK"
 ---
 
-# 法典網
+# Codex Web
 
 ## 多語言
 

@@ -6,7 +6,7 @@ metadata:
   lang: "hi"
 ---
 
-# कोडेक्स वेब
+# Codex Web
 
 ## बहुभाषी
 

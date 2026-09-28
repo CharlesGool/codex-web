@@ -6,7 +6,7 @@ metadata:
   lang: "es"
 ---
 
-# Web del códice
+# Codex Web
 
 ## Multilingüe
 

@@ -6,7 +6,7 @@ metadata:
   lang: "zh-CN"
 ---
 
-# 法典网
+# Codex Web
 
 ## 多语言
 

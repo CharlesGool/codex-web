@@ -5,7 +5,7 @@
      ? (i = t[1])
      : ((i = $(
 -        `no-drag pointer-events-auto grid w-[340px] max-w-[70vw] grid-cols-[minmax(0,1fr)_auto_auto] overflow-hidden rounded-[20px] border-[0.5px] border-default bg-surface-secondary shadow-[0px_8px_16px_-4px_rgba(0,0,0,0.12)]`,
-+        `no-drag pointer-events-auto grid w-[340px] max-w-[70vw] grid-cols-[minmax(0,1fr)_auto_auto] overflow-hidden rounded-2xl border border-default bg-background shadow-lg`,
++        `no-drag pointer-events-auto grid w-[340px] max-w-[70vw] grid-cols-[minmax(0,1fr)_auto_auto] overflow-hidden rounded-2xl border border-default bg-surface-elevated-secondary shadow-lg`,
          r,
        )),
        (t[0] = r),
