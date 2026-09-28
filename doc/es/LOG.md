@@ -89,6 +89,21 @@ Revisión de documentación y licencias: el proceso de pago ascendente declara M
 - Pendiente: Revisar la naturalidad de todas las traducciones y los textos de licencia de terceros. Tras recargar en un navegador autenticado, probar los controles de voz, el aviso del historial de ChatGPT, el menú y la página de cambios, y iPhone, Android y tabletas reales en vertical y horizontal. No se prevé una actualización gradual. No se encontró ningún archivo de reglas temporales del proyecto.
 - Siguiente paso: Completar la prueba en un navegador autenticado cuando Chrome esté disponible.
 
+- Versión candidata: `v0.0.1-test.1` es una versión de prueba solo con código fuente. El resumen está en la sección Versión de prueba. Antes de publicarla hay que comprobar la aplicación de parches, la compilación de producción, la documentación y el artefacto final. Los flujos autenticados y los dispositivos físicos siguen sin verificar; esta publicación no reinició el servicio en ejecución. El repositorio de GitHub es público.
+- Comprobaciones de la candidata: La reaplicación de parches y las compilaciones de producción del navegador y del servidor TypeScript pasaron en una copia aislada. Los recursos web finales contienen `v0.0.1-test.1` y el historial candidato se muestra en los ocho idiomas admitidos. Las comprobaciones de documentos, traducción y estructura terminaron sin errores; durante la comprobación de estructura se apartó temporalmente la carpeta `.playwright-cli` no seguida que ya existía y después se restauró. Quedan pendientes las pruebas con autenticación y dispositivos físicos.
+
+## Versión de prueba
+
+### v0.0.1-test.1 (2026-09-28)
+
+#### Cambios incluidos
+
+- El servidor web incluye autenticación y acceso por IP de confianza, descarga y vista previa de archivos, búsqueda en conversaciones, historial local de cambios y correcciones del área visible en móviles. Los controles exclusivos de escritorio no compatibles se ocultan o muestran como no disponibles.
+
+#### Verificación y límites
+
+- Esta versión de prueba solo contiene código fuente y requiere obtener por separado el paquete de escritorio para compilarla. Faltan pruebas de los flujos autenticados en el navegador y de dispositivos móviles físicos; no se adjuntan recursos extraídos de la aplicación de escritorio.
+
 ## Historial de cambios
 
 ### 0.0.1 (inédito; trabajo actualizado el 28 de septiembre de 2026)
@@ -131,6 +146,7 @@ Revisión de documentación y licencias: el proceso de pago ascendente declara M
 | `74acac2` | Usar el idioma elegido en la aplicación para la página de cambios. |
 | `f3bad65` | Registrar el traspaso verificado de la corrección del idioma. |
 | `98c2caf` | Restaurar el fondo de la búsqueda de conversaciones. |
-| Commit actual | Registrar el traspaso verificado de la corrección de búsqueda. |
+| `a86cd7b` | Registrar el traspaso verificado de la corrección de búsqueda. |
+| Commit actual | Preparar la versión de prueba solo con código fuente y el historial candidato traducido. |
 
 El historial de Git sigue siendo la fuente definitiva.

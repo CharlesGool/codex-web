@@ -1,6 +1,7 @@
 {
   "title": "Changelog",
   "sectionHeading": "Changelog",
+  "candidateHeading": "Test Candidate",
   "home": "Back to Codex Web",
   "loading": "Loading updates…",
   "error": "The changelog could not be loaded.",

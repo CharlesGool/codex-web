@@ -89,6 +89,21 @@ Examen de la documentation et des licences : la caisse en amont déclare MIT da
 - À faire: Relire la qualité de toutes les traductions et les textes des licences tierces. Après actualisation forcée dans un navigateur connecté, tester les commandes vocales, l’avis sur l’historique ChatGPT, le menu et la page des modifications, ainsi que de vrais iPhone, appareils Android et tablettes en portrait et paysage. Aucune mise à jour progressive n’est prévue. Aucun fichier de règles temporaires du projet n’a été trouvé.
 - Prochaine étape: Terminer le contrôle dans un navigateur connecté lorsque Chrome sera disponible.
 
+- Version candidate : `v0.0.1-test.1` est une version de test limitée au code source. Son résumé figure dans la section Version de test ci-dessous. Avant publication, il faut vérifier la réapplication des correctifs, la compilation de production, les documents et l’artefact final. Les parcours authentifiés et les appareils physiques restent à vérifier ; cette publication n’a pas redémarré le service en cours. Le dépôt GitHub est public.
+- Vérifications de la version candidate : La réapplication des correctifs ainsi que les compilations de production du navigateur et du serveur TypeScript ont réussi dans une copie isolée. Les ressources Web finales contiennent `v0.0.1-test.1` et le journal candidat s’affiche dans les huit langues prises en charge. Les vérifications des documents, traductions et de la structure n’ont relevé aucune erreur ; le dossier `.playwright-cli` préexistant et non suivi a été déplacé temporairement puis restauré pour la vérification de la structure. Les tests avec authentification et sur appareils physiques restent à faire.
+
+## Version de test
+
+### v0.0.1-test.1 (2026-09-28)
+
+#### Modifications incluses
+
+- Le serveur Web comprend l’authentification et l’accès par IP de confiance, le téléchargement et l’aperçu des fichiers, la recherche dans les conversations, un journal local des modifications et des corrections de la zone visible sur mobile. Les commandes propres à l’application de bureau qui ne fonctionnent pas sont masquées ou signalées comme indisponibles.
+
+#### Vérifications et limites
+
+- Cette version de test ne contient que le code source et nécessite d’obtenir séparément l’application de bureau pour la compilation. Les parcours avec authentification et les appareils mobiles physiques restent à vérifier ; aucune ressource extraite de l’application de bureau n’est jointe à cette publication.
+
 ## Historique des modifications
 
 ### 0.0.1 (inédit ; travail mis à jour le 2026-09-28)
@@ -131,6 +146,7 @@ Examen de la documentation et des licences : la caisse en amont déclare MIT da
 | `74acac2` | Faire suivre à la page des modifications la langue choisie dans l’application. |
 | `f3bad65` | Consigner la passation vérifiée de la correction de langue. |
 | `98c2caf` | Rétablir le fond de la recherche dans les conversations. |
-| Commit actuel | Consigner la passation vérifiée de la correction de recherche. |
+| `a86cd7b` | Consigner la passation vérifiée de la correction de recherche. |
+| Commit actuel | Préparer la version de test limitée au code source et le journal candidat traduit. |
 
 Le journal Git reste la référence complète de l’historique.

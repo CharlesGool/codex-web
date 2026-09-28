@@ -90,6 +90,21 @@ Documentation and licensing review: The upstream checkout declares MIT in `packa
 - Remaining: Review natural wording in all translated documents and the third-party license texts. Test the changed UI after a hard refresh in an authenticated browser, including the voice controls, ChatGPT history notice, changelog menu and page, and physical iPhone, Android, and tablet portrait and landscape layouts. No rolling update is planned. No temporary project rules file was found.
 - Next action: Complete an authenticated browser check when Chrome is available.
 
+- Release candidate: `v0.0.1-test.1` is a source-only test release candidate. The versioned summary is in Test Candidate below. Patch replay, production build, document checks, and final artifact inspection are required before publication. Authenticated browser and physical-device behavior remain unverified; the running service has not been restarted for this release. The GitHub repository is public.
+- Candidate checks: Patch replay, browser production build, and server TypeScript build passed in an isolated checkout. The final web assets contain `v0.0.1-test.1`, and the candidate changelog renders in all eight supported languages. The document, translation, and structure checks passed with zero errors; the structure check temporarily moved the pre-existing untracked `.playwright-cli` folder aside and restored it. Authenticated browser checks and real-device checks remain outstanding.
+
+## Test Candidate
+
+### v0.0.1-test.1 (2026-09-28)
+
+#### Included
+
+- The browser host includes authentication and trusted-IP access, file download and preview, conversation search, local changelog, and mobile viewport fixes. Unsupported desktop-only controls show an unavailable state or are hidden.
+
+#### Verification and limits
+
+- This source-only candidate requires a separately obtained desktop bundle to build. Authenticated browser flows and physical mobile devices remain unverified; extracted desktop assets are not attached to this release.
+
 ## Changelog
 
 ### 0.0.1 (unreleased; work updated 2026-09-28)
@@ -131,6 +146,7 @@ Documentation and licensing review: The upstream checkout declares MIT in `packa
 | `74acac2` | Follow the selected app language in the changelog. |
 | `f3bad65` | Record the verified language-fix handoff. |
 | `98c2caf` | Restore the conversation search background. |
-| Current commit | Record the verified search-style handoff. |
+| `a86cd7b` | Record the verified search-style handoff. |
+| Current commit | Prepare the source-only test release and localized candidate changelog. |
 
 The Git log remains the authoritative history.

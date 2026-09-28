@@ -41,19 +41,23 @@
       const content = document.getElementById("content");
       let labels;
       try {
-        const [labelsResponse, logResponse] = await Promise.all([
+        const [labelsResponse, logResponse, releaseResponse] = await Promise.all([
           fetch(`/changelog-${language}.json`),
           fetch(`/changelog-${language}.md`),
+          fetch("/release.json"),
         ]);
-        if (!labelsResponse.ok || !logResponse.ok) throw new Error("load failed");
+        if (!labelsResponse.ok || !logResponse.ok || !releaseResponse.ok) throw new Error("load failed");
         labels = await labelsResponse.json();
-        document.title = `${labels.title} · Codex Web`;
-        document.getElementById("title").textContent = labels.title;
+        const release = await releaseResponse.json();
+        if (!/^v\d+\.\d+\.\d+(?:-test\.\d+)?$/.test(release.version)) throw new Error("invalid version");
+        document.title = `${labels.title} ${release.version} · Codex Web`;
+        document.getElementById("title").textContent = `${labels.title} ${release.version}`;
         document.getElementById("home").textContent = labels.home;
         content.textContent = labels.loading;
         const source = await logResponse.text();
         const lines = source.split(/\r?\n/);
-        const start = lines.findIndex(line => line.trim() === `## ${labels.sectionHeading}`);
+        const sectionHeading = release.channel === "test" ? labels.candidateHeading : labels.sectionHeading;
+        const start = lines.findIndex(line => line.trim() === `## ${sectionHeading}`);
         if (start < 0) throw new Error("section missing");
         content.replaceChildren();
         let list = null;
