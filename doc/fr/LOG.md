@@ -91,6 +91,7 @@ Examen de la documentation et des licences : la caisse en amont déclare MIT da
 
 - Version candidate : `v0.0.1-test.1` est une version de test limitée au code source. Son résumé figure dans la section Version de test ci-dessous. Avant publication, il faut vérifier la réapplication des correctifs, la compilation de production, les documents et l’artefact final. Les parcours authentifiés et les appareils physiques restent à vérifier ; cette publication n’a pas redémarré le service en cours. Le dépôt GitHub est public.
 - Vérifications de la version candidate : La réapplication des correctifs ainsi que les compilations de production du navigateur et du serveur TypeScript ont réussi dans une copie isolée. Les ressources Web finales contiennent `v0.0.1-test.1` et le journal candidat s’affiche dans les huit langues prises en charge. Les vérifications des documents, traductions et de la structure n’ont relevé aucune erreur ; le dossier `.playwright-cli` préexistant et non suivi a été déplacé temporairement puis restauré pour la vérification de la structure. Les tests avec authentification et sur appareils physiques restent à faire.
+- Publication : Dans le dépôt public GitHub, le tag annoté `v0.0.1-test.1` pointe vers le commit de publication `e32f453` ; GitHub Release est publié comme préversion sans binaire joint. L’instantané local du code source dans `../snapshots/v0.0.1-test.1` contient 160 fichiers et correspond à ce tag. L’outil standard d’export a refusé le suffixe `-test.1` ; l’export a donc utilisé une copie temporaire qui étendait uniquement le format accepté des tags. Le service en cours n’a été ni redémarré ni redéployé.
 
 ## Version de test
 
@@ -147,6 +148,7 @@ Examen de la documentation et des licences : la caisse en amont déclare MIT da
 | `f3bad65` | Consigner la passation vérifiée de la correction de langue. |
 | `98c2caf` | Rétablir le fond de la recherche dans les conversations. |
 | `a86cd7b` | Consigner la passation vérifiée de la correction de recherche. |
-| Commit actuel | Préparer la version de test limitée au code source et le journal candidat traduit. |
+| `e32f453` | Préparer la version de test limitée au code source et le journal candidat traduit. |
+| Commit actuel | Consigner la publication de test vérifiée et la passation de l’instantané. |
 
 Le journal Git reste la référence complète de l’historique.

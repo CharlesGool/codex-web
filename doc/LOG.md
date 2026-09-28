@@ -92,6 +92,7 @@ Documentation and licensing review: The upstream checkout declares MIT in `packa
 
 - Release candidate: `v0.0.1-test.1` is a source-only test release candidate. The versioned summary is in Test Candidate below. Patch replay, production build, document checks, and final artifact inspection are required before publication. Authenticated browser and physical-device behavior remain unverified; the running service has not been restarted for this release. The GitHub repository is public.
 - Candidate checks: Patch replay, browser production build, and server TypeScript build passed in an isolated checkout. The final web assets contain `v0.0.1-test.1`, and the candidate changelog renders in all eight supported languages. The document, translation, and structure checks passed with zero errors; the structure check temporarily moved the pre-existing untracked `.playwright-cli` folder aside and restored it. Authenticated browser checks and real-device checks remain outstanding.
+- Publication: The public GitHub repository has an annotated `v0.0.1-test.1` tag pointing to release commit `e32f453`; the GitHub Release is published as a pre-release with no uploaded binaries. The local source snapshot at `../snapshots/v0.0.1-test.1` has 160 archived files and matches that tag. The standard snapshot exporter rejected the `-test.1` suffix, so an otherwise identical temporary copy accepted the documented test-tag format and performed the export. The running service was not restarted or redeployed.
 
 ## Test Candidate
 
@@ -147,6 +148,7 @@ Documentation and licensing review: The upstream checkout declares MIT in `packa
 | `f3bad65` | Record the verified language-fix handoff. |
 | `98c2caf` | Restore the conversation search background. |
 | `a86cd7b` | Record the verified search-style handoff. |
-| Current commit | Prepare the source-only test release and localized candidate changelog. |
+| `e32f453` | Prepare the source-only test release and localized candidate changelog. |
+| Current commit | Record the verified test prerelease and snapshot handoff. |
 
 The Git log remains the authoritative history.

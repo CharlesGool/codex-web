@@ -91,6 +91,7 @@ Revisión de documentación y licencias: el proceso de pago ascendente declara M
 
 - Versión candidata: `v0.0.1-test.1` es una versión de prueba solo con código fuente. El resumen está en la sección Versión de prueba. Antes de publicarla hay que comprobar la aplicación de parches, la compilación de producción, la documentación y el artefacto final. Los flujos autenticados y los dispositivos físicos siguen sin verificar; esta publicación no reinició el servicio en ejecución. El repositorio de GitHub es público.
 - Comprobaciones de la candidata: La reaplicación de parches y las compilaciones de producción del navegador y del servidor TypeScript pasaron en una copia aislada. Los recursos web finales contienen `v0.0.1-test.1` y el historial candidato se muestra en los ocho idiomas admitidos. Las comprobaciones de documentos, traducción y estructura terminaron sin errores; durante la comprobación de estructura se apartó temporalmente la carpeta `.playwright-cli` no seguida que ya existía y después se restauró. Quedan pendientes las pruebas con autenticación y dispositivos físicos.
+- Publicación: En el repositorio público de GitHub, la etiqueta anotada `v0.0.1-test.1` apunta al commit de publicación `e32f453`; GitHub Release está publicada como versión preliminar sin binarios adjuntos. La instantánea local del código fuente en `../snapshots/v0.0.1-test.1` contiene 160 archivos y corresponde a esa etiqueta. El exportador estándar rechazó el sufijo `-test.1`, por lo que la exportación se hizo con una copia temporal que solo amplió el formato admitido de etiquetas. El servicio en ejecución no se reinició ni se volvió a desplegar.
 
 ## Versión de prueba
 
@@ -147,6 +148,7 @@ Revisión de documentación y licencias: el proceso de pago ascendente declara M
 | `f3bad65` | Registrar el traspaso verificado de la corrección del idioma. |
 | `98c2caf` | Restaurar el fondo de la búsqueda de conversaciones. |
 | `a86cd7b` | Registrar el traspaso verificado de la corrección de búsqueda. |
-| Commit actual | Preparar la versión de prueba solo con código fuente y el historial candidato traducido. |
+| `e32f453` | Preparar la versión de prueba solo con código fuente y el historial candidato traducido. |
+| Commit actual | Registrar la publicación de prueba y el traspaso de la instantánea verificados. |
 
 El historial de Git sigue siendo la fuente definitiva.
