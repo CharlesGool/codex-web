@@ -85,9 +85,9 @@ Examen de la documentation et des licences : la caisse en amont déclare MIT da
 - Terminé: La structure amont avec extraction puis correctifs, les répertoires standard et `deploy/start.sh` ont été conservés ou ajoutés, et les limites du déploiement documentées. Les corrections Web couvrent la connexion et les IP de confiance, les actions sur les fichiers et leurs aperçus, les aperçus statiques de sites, la suppression d’images non envoyées, la recherche dans les conversations, l’ouverture dans un nouvel onglet, l’adaptation mobile et l’indication des fonctions propres au bureau indisponibles. Le menu d’aide renvoie à ce projet. Ce travail masque les actions vocales, signale les réglages vocaux et l’historique ChatGPT ordinaire comme indisponibles et ajoute une page locale des modifications. Ces ressources statiques ont été installées sur le site actif sans redémarrage. La page des modifications suit maintenant la langue choisie dans l’application.
 - Vérifications: Les contrôles précédents sur les correctifs, la syntaxe JavaScript, l’authentification et les tailles de navigateur ont réussi. Cette fois, le nouveau correctif a été appliqué, la syntaxe des deux fichiers JavaScript modifiés et du script de la page des modifications a été vérifiée, le rendu des huit langues documentaires a été simulé et les contrôles de format, de traduction et de structure des 32 documents ont réussi avec 0 erreur. Playwright n’a pas pu être exécuté car Chrome n’est pas installé. La reconstruction complète du client extrait du paquet de bureau, jusqu’à la compression des ressources, a réussi. Les contrôles dans un navigateur connecté restent à faire. La priorité de la langue de l’application sur celle du navigateur et la reconstruction complète avec correctifs ont également été vérifiées.
 - Déploiement: `codex-web.service` reste actif sur son adresse LAN enregistrée avec le même processus démarré le 2026-09-27. Les ressources statiques ont été mises à jour dans `~/Desktop/apps/codex-web`; l’ancien déploiement dans `~/Desktop/app/codex-web` et une copie des fichiers remplacés restent disponibles pour revenir en arrière. Sans session, la page des modifications a répondu HTTP 401 comme prévu. Tout redémarrage manuel ultérieur exige une nouvelle confirmation explicite après explication de son effet.
-- GitHub: Le dépôt public `CharlesGool/codex-web` utilise `main`; le commit `9a2d0a9` a été envoyé et la branche distante vérifiée. Cette correction de langue attend la revue finale et l’envoi.
+- GitHub: Le dépôt public `CharlesGool/codex-web` utilise `main`; le commit `74acac2` a été envoyé et la branche distante vérifiée.
 - À faire: Relire la qualité de toutes les traductions et les textes des licences tierces. Après actualisation forcée dans un navigateur connecté, tester les commandes vocales, l’avis sur l’historique ChatGPT, le menu et la page des modifications, ainsi que de vrais iPhone, appareils Android et tablettes en portrait et paysage. Aucune mise à jour progressive n’est prévue. Aucun fichier de règles temporaires du projet n’a été trouvé.
-- Prochaine étape: Examiner et envoyer cette correction de langue sur `main`; terminer le contrôle dans un navigateur connecté lorsque Chrome sera disponible.
+- Prochaine étape: Terminer le contrôle dans un navigateur connecté lorsque Chrome sera disponible.
 
 ## Historique des modifications
 
@@ -127,6 +127,7 @@ Examen de la documentation et des licences : la caisse en amont déclare MIT da
 | `47b2ab3` | Consigner la mise à jour de la branche par défaut. |
 | `6f83e02` | Signaler les fonctions du navigateur indisponibles et ajouter la page des modifications. |
 | `9a2d0a9` | Consigner la passation vérifiée sur GitHub. |
-| Commit actuel | Faire suivre à la page des modifications la langue choisie dans l’application. |
+| `74acac2` | Faire suivre à la page des modifications la langue choisie dans l’application. |
+| Commit actuel | Consigner la passation vérifiée de la correction de langue. |
 
 Le journal Git reste la référence complète de l’historique.
