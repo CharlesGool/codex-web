@@ -49,7 +49,7 @@ From a checkout with a prepared desktop bundle and installed dependencies, run `
 - The browser UI uses the signed-in Codex CLI on the host. Local files can be downloaded or opened in a separate File Browser service if one is configured.
 - A website resource opens a view-only static preview. It does not start that website's backend.
 - An image awaiting send can be removed from either its thumbnail or the full-screen preview. Removing it stops it from being included in the draft.
-- The browser host does not synchronize ordinary ChatGPT chats from the web or mobile. Voice controls are unavailable here; the Voice settings page shows that state. The question-mark menu opens this fork's changelog.
+- The browser host does not synchronize ordinary ChatGPT chats from the web or mobile. Voice controls are unavailable here; the Voice settings page shows that state. The question-mark menu opens this fork's changelog in the selected app language.
 - `CODEX_CLI_PATH` selects the CLI. `CODEX_WEB_NODE_BIN_DIR` and `CODEX_WEB_GIT_BIN_DIR` select runtime tool directories when they are outside `PATH`. `CODEX_WEB_AUTH_FILE` and `CODEX_WEB_TRUSTED_IPS_FILE` select authentication files. See the [previous upstream-oriented README](third_party/codex-web/README.previous.md) for credential rotation and trusted-IP commands.
 - A hard refresh may be needed after replacing a web asset without changing its filename because versioned assets can be cached briefly.
 

@@ -78,16 +78,17 @@ Documentation and licensing review: The upstream checkout declares MIT in `packa
 | Size the web app to the browser's visual viewport on mobile and tablet. | The inherited `100vh` root and shell heights can exceed the area left by dynamic browser bars or the on-screen keyboard. The visual viewport also reports its top offset, which can change while the keyboard is visible. |
 | Show voice and ordinary ChatGPT chat history as unavailable in this browser host. | The deployed HTTP page has no microphone access, desktop voice features do not transfer automatically, and the local Codex app-server does not list ordinary ChatGPT account chats. Hide voice actions while retaining Codex chat history. |
 | Open a local changelog page from the sidebar question-mark menu. | The user requested a visible update history for this fork; the page reads the localized changelog bundled with the static assets. |
+| Use the selected app language for the changelog. | The app's resolved locale already reflects the language setting; passing it to the separate page keeps the menu and page consistent. Direct visits use the browser language. |
 
 ## Handoff
 
 - Branch: `main`, fast-forwarded from `feat/standardize-layout`. The browser and documentation changes are published on the default branch.
-- Completed: Kept the upstream extract-then-patch layout, added standard project directories and a new `deploy/start.sh`, and documented the deployment boundaries. Browser fixes cover login and trusted IPs, file actions and previews, static website previews, unsent image removal, conversation search, opening chats in a browser tab, mobile viewport sizing, and unavailable desktop-only features. The help menu links to this fork. The current work hides voice actions, marks Voice settings and ordinary ChatGPT history unavailable, and adds a local changelog page. These static assets were installed on the live site without a restart.
-- Checks: Earlier patch replay, JavaScript syntax, authentication, and browser-size checks passed. This pass rebuilt the extracted client from the desktop package through asset compression, checked both changed JavaScript bundles and the changelog script syntax, rendered the changelog for all eight documentation languages in a script harness, and passed the 32-document format, translation, and project-structure checks with 0 errors. Playwright could not run because Chrome is not installed. Authenticated browser checks remain outstanding.
+- Completed: Kept the upstream extract-then-patch layout, added standard project directories and a new `deploy/start.sh`, and documented the deployment boundaries. Browser fixes cover login and trusted IPs, file actions and previews, static website previews, unsent image removal, conversation search, opening chats in a browser tab, mobile viewport sizing, and unavailable desktop-only features. The help menu links to this fork. Voice actions are hidden, Voice settings and ordinary ChatGPT history are marked unavailable, and the local changelog page now follows the selected app language. These static assets were installed on the live site without a restart.
+- Checks: Earlier patch replay, JavaScript syntax, authentication, and browser-size checks passed. This pass rebuilt the extracted client from the desktop package through asset compression, checked the changed JavaScript bundles and changelog script syntax, exercised app-language selection and page rendering for eight languages in a script harness, and passed the 32-document format, translation, and project-structure checks with 0 errors. Playwright could not run because Chrome is not installed. Authenticated browser checks remain outstanding.
 - Deployment: `codex-web.service` remains active on its registered LAN endpoint with the same process started on 2026-09-27. Its static assets were updated under `~/Desktop/apps/codex-web`; the earlier deployment at `~/Desktop/app/codex-web` and a backup of the replaced files remain available for rollback. The changelog route returned HTTP 401 without a session, as expected. Any future operator-initiated restart requires fresh, explicit user confirmation after the impact is stated.
-- GitHub: The public `CharlesGool/codex-web` repository uses `main`; commit `6f83e02` was pushed and the remote branch was verified.
+- GitHub: The public `CharlesGool/codex-web` repository uses `main`; commit `9a2d0a9` was pushed and the remote branch was verified. This locale fix is pending final review and push.
 - Remaining: Review natural wording in all translated documents and the third-party license texts. Test the changed UI after a hard refresh in an authenticated browser, including the voice controls, ChatGPT history notice, changelog menu and page, and physical iPhone, Android, and tablet portrait and landscape layouts. No rolling update is planned. No temporary project rules file was found.
-- Next action: Complete an authenticated browser check when Chrome is available.
+- Next action: Review and push this locale fix to `main`, then complete an authenticated browser check when Chrome is available.
 
 ## Changelog
 
@@ -99,7 +100,7 @@ Documentation and licensing review: The upstream checkout declares MIT in `packa
 - The sidebar question-mark menu now links to this fork on GitHub; the desktop-only application menus remain hidden. The conversation search field now matches the white surface and subtle shadow of existing menus.
 - Pets, keyboard shortcuts, and Computer Use settings display an unavailable state; the sidebar Help menu no longer offers Chrome extension setup. Scheduled tasks now shows a deployment-specific unavailable state instead of a broken cloud list and task suggestions. The pet profile action, pet slash command, shortcut help entry, app shortcut bindings, desktop application menu, and obsolete default file open destination setting are hidden or disabled in the web UI.
 - The project keeps the inherited upstream build layout while moving new first-party structure and the service launcher into standard directories.
-- Browser voice controls are hidden or shown as unavailable, and the ChatGPT chat-history area explains that ordinary web and mobile chats cannot be synchronized here. The sidebar help menu now opens a local changelog page.
+- Browser voice controls are hidden or shown as unavailable, and the ChatGPT chat-history area explains that ordinary web and mobile chats cannot be synchronized here. The sidebar help menu now opens a local changelog page in the selected app language.
 
 #### Fixed
 
@@ -125,6 +126,7 @@ Documentation and licensing review: The upstream checkout declares MIT in `packa
 | `7347aa6` | Record the verified GitHub handoff. |
 | `47b2ab3` | Record promotion to the default branch. |
 | `6f83e02` | Mark unavailable browser features and add the changelog page. |
-| Current commit | Record the verified GitHub handoff. |
+| `9a2d0a9` | Record the verified GitHub handoff. |
+| Current commit | Follow the selected app language in the changelog. |
 
 The Git log remains the authoritative history.

@@ -37,6 +37,8 @@ La aplicación implementada está bajo`~/Desktop/apps/codex-web`en este anfitri�
 
 El servidor web y el cliente extraído tienen versiones por separado.`scripts/prepare_asar`registra el orden de los parches del cliente, mientras`assets/`Contiene pequeñas páginas propias y ayudantes de ventana gráfica. El navegador utiliza rutas autenticadas del mismo origen para vistas previas y descargas de archivos locales. La configuración de credenciales e IP confiables se encuentra fuera del proceso de pago, por lo que la reconstrucción no restablece el acceso.
 
+El menú de ayuda pasa el idioma efectivo de la aplicación a la página independiente de cambios. Si se visita directamente sin recibir el idioma de la aplicación, usa el idioma del navegador. Las etiquetas están en `lang/changelog/` y las entradas proceden del `doc/LOG.md` traducido correspondiente.
+
 ## Restricciones de diseño
 
 - Mantenga las entradas raíz ascendentes enumeradas en[LOG](LOG.md#preserved-upstream-root-entries). Los nuevos archivos propios utilizan directorios de proyectos estándar.

@@ -49,7 +49,7 @@ metadata:
 - 瀏覽器 UI 使用主機上登入的 Codex CLI.如果配置了本機文件, 則可以在單獨的文件瀏覽器服務中下載或開啟本機檔案.
 - 網站資源開啟僅供查看的靜態預覽.它不會啟動該網站的後端.
 - 等待發送的圖像可以從其縮圖或全螢幕預覽中刪除.刪除它會阻止它被包含在草稿中.
-- 此網站不會同步 ChatGPT 網頁或手機上的一般聊天記錄. 語音功能在此不可用, 語音設定頁會顯示提示. 左下角問號選單可開啟本專案的更新紀錄.
+- 此網站不會同步 ChatGPT 網頁或手機上的一般聊天記錄. 語音功能在此不可用, 語音設定頁會顯示提示. 左下角問號選單可開啟本專案的更新紀錄. 更新紀錄會使用 Codex Web 設定中的語言.
 - `CODEX_CLI_PATH`選擇 CLI.`CODEX_WEB_NODE_BIN_DIR`和`CODEX_WEB_GIT_BIN_DIR`當運行時工具目錄在外部時選擇它們`PATH`. `CODEX_WEB_AUTH_FILE`和`CODEX_WEB_TRUSTED_IPS_FILE`選擇身份驗證文件.請參閱[previous upstream-oriented README](third_party/codex-web/README.previous.md)用於憑證輪替和可信任 IP 指令.
 - 替換 Web 資源而不更改其檔案名稱後, 可能需要進行硬刷新, 因為版本化資源可以短暫快取.
 

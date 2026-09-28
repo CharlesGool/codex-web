@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Apply hosted Web UI wording to the extracted Chinese locale bundle."""
+"""Apply hosted Web UI wording to extracted desktop locale bundles."""
 
 from pathlib import Path
+import json
 import re
 
 
@@ -33,6 +34,33 @@ replace_locale("projectSetup.createProject.localDescription", "在你的电脑�
 replace_locale("imageAttachment.removeAriaLabel", "移除“{filename}”", "移除“{filename}”", '"imageAttachment.removeImage":`移除图片`,')
 replace_locale("imageAttachment.removeImage", "移除图片", "移除图片", '"codexWeb.trustedIps.title":`IP 白名单`,"codexWeb.trustedIps.description":`列表中的内网 IP 无需密码即可打开面板。保存后立即生效。`,"codexWeb.trustedIps.current":`当前连接：`,"codexWeb.trustedIps.loading":`加载中…`,"codexWeb.trustedIps.thisDevice":`此设备`,"codexWeb.trustedIps.remove":`移除`,"codexWeb.trustedIps.empty":`暂无可信 IP`,"codexWeb.trustedIps.input":`IP 地址`,"codexWeb.trustedIps.add":`添加 IP`,"codexWeb.trustedIps.saving":`保存中…`,"codexWeb.trustedIps.save":`保存更改`,"codexWeb.trustedIps.saved":`IP 白名单已保存`,"codexWeb.trustedIps.currentRemoved":`保存后，此设备下次访问需要输入账号和密码。`,"codexWeb.trustedIps.invalid":`请输入内网或回环 IPv4 地址`,"codexWeb.trustedIps.duplicate":`此 IP 已在列表中`,"codexWeb.trustedIps.limit":`白名单最多包含 128 个地址`,"codexWeb.trustedIps.loadError":`无法加载 IP 白名单`,"codexWeb.trustedIps.saveError":`无法保存 IP 白名单`,')
 replace_locale("threadHeader.openInNewWindow", "在新窗口中打开", "在新标签页中打开", '"codexWeb.chatHistoryUnavailable":`此网站不支持同步 ChatGPT 网页或手机中的聊天记录。`,"codexWeb.help.changelog":`更新日志`,')
+
+
+def add_changelog_label(bundle: str, language: str) -> None:
+    path = ASSETS / bundle
+    label = json.loads((Path("lang/changelog") / f"{language}.json").read_text())["title"]
+    contents = path.read_text()
+    pattern = re.compile(r'("threadHeader\.openInNewWindow"\s*:\s*`[^`]*`,)')
+    matches = list(pattern.finditer(contents))
+    if len(matches) != 1 or '"codexWeb.help.changelog"' in contents:
+        raise SystemExit(f"Expected one unchanged help-menu locale anchor in {path}")
+    match = matches[0]
+    entry = f'"codexWeb.help.changelog":{json.dumps(label, ensure_ascii=False)},'
+    path.write_text(contents[:match.end()] + entry + contents[match.end():])
+
+
+for bundle, language in (
+    ("ar-af51e6cc3410.js", "ar"),
+    ("es-ES-48bcfd1d6566.js", "es"),
+    ("es-419-b091614332db.js", "es"),
+    ("fr-FR-6d7e94eb215b.js", "fr"),
+    ("fr-CA-6c1377bae8d8.js", "fr"),
+    ("hi-IN-e55899f80200.js", "hi"),
+    ("zh-TW-2b0e42dad368.js", "zh-TW"),
+    ("zh-HK-5324468e7cdc.js", "zh-HK"),
+):
+    add_changelog_label(bundle, language)
+
 replace_once(
     ASSETS / "app-primary-6b28e06666ff.js",
     'id: `projectSetup.createProject.localLabel`,\n              defaultMessage: `Local`',

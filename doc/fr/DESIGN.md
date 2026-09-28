@@ -37,6 +37,8 @@ L'application déployée est sous`~/Desktop/apps/codex-web`sur cet hôte. Le pri
 
 L'hébergeur Web et le client extrait sont versionnés séparément.`scripts/prepare_asar`enregistre l'ordre des correctifs clients, tandis que`assets/`contient de petites pages propriétaires et des assistants de fenêtre. Le navigateur utilise des routes authentifiées de même origine pour les aperçus et les téléchargements de fichiers locaux. Les paramètres des informations d'identification et des adresses IP de confiance se trouvent en dehors de la caisse, de sorte que la reconstruction ne réinitialise pas l'accès.
 
+Le menu d’aide transmet la langue effective de l’application à la page indépendante des modifications. Si cette page est ouverte directement sans langue transmise par l’application, elle utilise la langue du navigateur. Ses libellés figurent dans `lang/changelog/` et ses entrées proviennent du `doc/LOG.md` traduit correspondant.
+
 ## Contraintes de conception
 
 - Conservez les entrées racine en amont répertoriées dans[LOG](LOG.md#preserved-upstream-root-entries). Les nouveaux fichiers propriétaires utilisent des répertoires de projet standard.

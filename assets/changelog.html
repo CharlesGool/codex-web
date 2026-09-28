@@ -31,7 +31,7 @@
   <main><article id="content" role="status"></article></main>
   <script>
     (async () => {
-      const requested = navigator.language;
+      const requested = new URLSearchParams(location.search).get("lang") || navigator.language;
       const supported = ["en", "zh-CN", "zh-TW", "zh-HK", "hi", "es", "ar", "fr"];
       const language = supported.find(tag => tag.toLowerCase() === requested.toLowerCase())
         ?? supported.find(tag => tag === requested.split("-")[0])

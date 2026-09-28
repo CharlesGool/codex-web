@@ -37,6 +37,8 @@ The deployed application is under `~/Desktop/apps/codex-web` on this host. The p
 
 The web host and the extracted client are versioned separately. `scripts/prepare_asar` records the order of client patches, while `assets/` contains small first-party pages and viewport helpers. The browser uses same-origin authenticated routes for local file previews and downloads. Settings for credentials and trusted IPs live outside the checkout so rebuilding does not reset access.
 
+The Help menu passes the app's resolved language to the static changelog page. A direct visit to that page uses the browser language when no app language was passed. Its labels are stored under `lang/changelog/`, and its entries come from the matching translated `doc/LOG.md`.
+
 ## Design Constraints
 
 - Keep the upstream root entries listed in [LOG](LOG.md#preserved-upstream-root-entries). New first-party files use standard project directories.

@@ -49,7 +49,7 @@ Desde una caja con un paquete de escritorio preparado y dependencias instaladas,
 - La interfaz de usuario del navegador utiliza la CLI del Codex registrada en el host. Los archivos locales se pueden descargar o abrir en un servicio de Explorador de archivos independiente si hay uno configurado.
 - Un recurso de sitio web abre una vista previa estática de solo visualización. No inicia el backend de ese sitio web.
 - Una imagen en espera de envío se puede eliminar de su miniatura o de la vista previa en pantalla completa. Eliminarlo impide que se incluya en el borrador.
-- Este sitio no sincroniza los chats normales de ChatGPT de la web o del móvil. Los controles de voz no están disponibles aquí y la página de ajustes de Voz lo indica. El menú del signo de interrogación abre el historial de cambios de este proyecto.
+- Este sitio no sincroniza los chats normales de ChatGPT de la web o del móvil. Los controles de voz no están disponibles aquí y la página de ajustes de Voz lo indica. El menú del signo de interrogación abre el historial de cambios de este proyecto. La página de cambios usa el idioma elegido en Codex Web.
 - `CODEX_CLI_PATH`selecciona la CLI.`CODEX_WEB_NODE_BIN_DIR`y`CODEX_WEB_GIT_BIN_DIR`seleccionar directorios de herramientas de tiempo de ejecución cuando estén fuera`PATH`. `CODEX_WEB_AUTH_FILE`y`CODEX_WEB_TRUSTED_IPS_FILE`seleccione archivos de autenticación. Ver el[previous upstream-oriented README](third_party/codex-web/README.previous.md)para rotación de credenciales y comandos de IP confiables.
 - Es posible que sea necesaria una actualización completa después de reemplazar un recurso web sin cambiar su nombre de archivo porque los activos versionados se pueden almacenar en caché brevemente.
 

@@ -49,14 +49,15 @@
    let f;
    return (
      t[9] !== d || t[10] !== n
-@@ -317059,6 +317070,17 @@
+@@ -317059,6 +317070,18 @@
      },
      children: navigator.language.startsWith(`zh`) ? `关于 Codex Web` : `About Codex Web`,
    });
 +  let changelog = (0, w4.jsx)(Cp.Item, {
 +    LeftIcon: Se,
 +    onSelect: () => {
-+      window.open(`/changelog.html`, `_blank`, `noopener,noreferrer`);
++      let language = document.documentElement.lang || navigator.language;
++      window.open(`/changelog.html?lang=${encodeURIComponent(language)}`, `_blank`, `noopener,noreferrer`);
 +    },
 +    children: (0, w4.jsx)(Y, {
 +      id: `codexWeb.help.changelog`,
@@ -67,7 +68,7 @@
    let w;
    return (
      t[24] !== n ||
-@@ -317076,7 +317098,7 @@
+@@ -317076,7 +317099,7 @@
            side: `top`,
            sideOffset: 6,
            triggerButton: p,
@@ -76,7 +77,7 @@
          })),
          (t[24] = n),
          (t[25] = S),
-@@ -336560,7 +336582,7 @@
+@@ -336560,7 +336583,7 @@
      o = Vl(),
      s = i.thread.phase,
      c = s === `starting` || s === `active`,
